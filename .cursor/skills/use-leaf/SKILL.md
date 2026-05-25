@@ -175,29 +175,32 @@ leaf is a binary-only crate — no `lib.rs`, no public API. To use its rendering
 3. Fix 2 couplings: `TableBuf::render` global theme → explicit param; `FileState` move out of `app`
 4. Replace tuple returns with `ParseOutput` struct
 
-**Public API (available now on `feat/expose-lib-api` branch):**
+**Recommended: use `leaf-core` (stable facade crate):**
 
 ```rust
-use leaf::markdown;
-use leaf::theme::{theme_by_preset, ThemePreset};
-use syntect::{highlighting::ThemeSet, parsing::SyntaxSet};
+use leaf_core::{render_to_ansi, MarkdownRenderer};
 
-let ss = SyntaxSet::load_defaults_newlines();
-let ts = ThemeSet::load_defaults();
-let app_theme = theme_by_preset(ThemePreset::OceanDark);
-let syntect_theme = &ts.themes["base16-ocean.dark"];
+// One-shot
+let ansi = render_to_ansi("# Hello\n\nworld", 80);
 
-// Parse → ParseOutput { lines, toc, links }
-let output = markdown::parse("# Hello\nworld", &ss, syntect_theme, &app_theme.markdown, false);
-
-// Render to ANSI string
-let mut buf = Vec::new();
-leaf::inline::write_lines(&output.lines, leaf::inline::ResolvedFormat::Ansi, 80, &mut buf).unwrap();
+// Reusable (caches syntax/theme assets)
+let renderer = MarkdownRenderer::new();
+let output = renderer.render("**bold** and `code`", 80);
+let ansi = renderer.render_to_ansi("# Title", 80);
+let plain = renderer.render_to_plain("# Title", 80);
 ```
 
-Key types: `ParseOutput` (`#[non_exhaustive]`), `TocEntry`, `LinkSpan`, `ThemePreset`, `AppTheme`, `MarkdownTheme`.
+```toml
+# Cargo.toml
+leaf-core = { path = "../leaf/crates/leaf-core" }
+# or git:
+leaf-core = { git = "https://github.com/StrayDragon/leaf" }
+```
 
-**Hard dependencies:** `ratatui::text::Line`, `syntect::parsing::SyntaxSet`, `syntect::highlighting::Theme`.
+Key types: `MarkdownRenderer`, `ParseOutput`, `TocEntry`, `LinkSpan`, `ThemePreset`.
+
+**Architecture:** `leaf-core` → `leaf` (lib) → `pulldown-cmark` + `ratatui` + `syntect`.
+Consumers never depend on `leaf` directly; `leaf-core` absorbs upstream changes.
 
 See [fork-guide.md](fork-guide.md) for detailed refactoring steps, type inventory, and effort estimates.
 
