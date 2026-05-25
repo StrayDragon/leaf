@@ -363,7 +363,7 @@ pub(super) fn highlighted_picker_label(
     spans
 }
 
-pub(crate) fn wrap_path_lines(
+pub fn wrap_path_lines(
     label: &str,
     path: &str,
     max_width: usize,

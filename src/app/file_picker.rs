@@ -7,7 +7,7 @@ use std::{
 use syntect::{highlighting::ThemeSet, parsing::SyntaxSet};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct FilePickerEntry {
+pub struct FilePickerEntry {
     label: String,
     path: PathBuf,
     label_lower: String,
@@ -37,7 +37,7 @@ impl FilePickerEntry {
         }
     }
 
-    pub(crate) fn label(&self) -> &str {
+    pub fn label(&self) -> &str {
         &self.label
     }
 
@@ -68,7 +68,7 @@ impl FilePickerEntry {
     }
 }
 
-pub(crate) struct FilePickerState {
+pub struct FilePickerState {
     pub(super) open: bool,
     pub(super) mode: FilePickerMode,
     pub(super) dir: PathBuf,
@@ -82,31 +82,31 @@ pub(crate) struct FilePickerState {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum FilePickerMode {
+pub enum FilePickerMode {
     Browser,
     Fuzzy,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) enum PendingPicker {
+pub enum PendingPicker {
     None,
     Browser(PathBuf),
     Fuzzy(PathBuf),
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum PickerIndexTruncation {
+pub enum PickerIndexTruncation {
     Directory,
     File,
     Time,
 }
 
-pub(crate) struct PickerIndexResult {
-    pub(crate) entries: Vec<FilePickerEntry>,
-    pub(crate) truncated: Option<PickerIndexTruncation>,
+pub struct PickerIndexResult {
+    pub entries: Vec<FilePickerEntry>,
+    pub truncated: Option<PickerIndexTruncation>,
 }
 
-pub(crate) enum PickerLoadState {
+pub enum PickerLoadState {
     Idle,
     Loading {
         mode: FilePickerMode,
@@ -132,36 +132,36 @@ impl App {
         self.file_picker.entries.get(idx)
     }
 
-    pub(crate) fn open_file_picker(&mut self, dir: PathBuf) -> bool {
+    pub fn open_file_picker(&mut self, dir: PathBuf) -> bool {
         self.open_file_picker_with_mode(dir, FilePickerMode::Browser)
     }
 
     #[cfg(test)]
-    pub(crate) fn open_fuzzy_file_picker(&mut self, dir: PathBuf) -> bool {
+    pub fn open_fuzzy_file_picker(&mut self, dir: PathBuf) -> bool {
         self.open_file_picker_with_mode(dir, FilePickerMode::Fuzzy)
     }
 
-    pub(crate) fn queue_file_picker(&mut self, dir: PathBuf) {
+    pub fn queue_file_picker(&mut self, dir: PathBuf) {
         self.pending_picker = PendingPicker::Browser(dir);
     }
 
-    pub(crate) fn queue_fuzzy_file_picker(&mut self, dir: PathBuf) {
+    pub fn queue_fuzzy_file_picker(&mut self, dir: PathBuf) {
         self.pending_picker = PendingPicker::Fuzzy(dir);
     }
 
-    pub(crate) fn has_pending_picker(&self) -> bool {
+    pub fn has_pending_picker(&self) -> bool {
         !matches!(self.pending_picker, PendingPicker::None)
     }
 
-    pub(crate) fn is_picker_loading(&self) -> bool {
+    pub fn is_picker_loading(&self) -> bool {
         matches!(self.picker_load_state, PickerLoadState::Loading { .. })
     }
 
-    pub(crate) fn is_picker_load_failed(&self) -> bool {
+    pub fn is_picker_load_failed(&self) -> bool {
         matches!(self.picker_load_state, PickerLoadState::Failed { .. })
     }
 
-    pub(crate) fn pending_picker_mode(&self) -> Option<FilePickerMode> {
+    pub fn pending_picker_mode(&self) -> Option<FilePickerMode> {
         match &self.picker_load_state {
             PickerLoadState::Loading { mode, .. } | PickerLoadState::Failed { mode, .. } => {
                 Some(*mode)
@@ -174,7 +174,7 @@ impl App {
         }
     }
 
-    pub(crate) fn pending_picker_dir(&self) -> Option<&std::path::Path> {
+    pub fn pending_picker_dir(&self) -> Option<&std::path::Path> {
         match &self.picker_load_state {
             PickerLoadState::Loading { dir, .. } | PickerLoadState::Failed { dir, .. } => {
                 Some(dir.as_path())
@@ -186,14 +186,14 @@ impl App {
         }
     }
 
-    pub(crate) fn picker_load_error(&self) -> Option<&str> {
+    pub fn picker_load_error(&self) -> Option<&str> {
         match &self.picker_load_state {
             PickerLoadState::Failed { message, .. } => Some(message.as_str()),
             PickerLoadState::Idle | PickerLoadState::Loading { .. } => None,
         }
     }
 
-    pub(crate) fn poll_picker_loading(&mut self) -> bool {
+    pub fn poll_picker_loading(&mut self) -> bool {
         let state = std::mem::replace(&mut self.picker_load_state, PickerLoadState::Idle);
         match state {
             PickerLoadState::Loading {
@@ -285,7 +285,7 @@ impl App {
     }
 
     #[cfg(test)]
-    pub(crate) fn age_picker_loading_by(&mut self, duration: Duration) {
+    pub fn age_picker_loading_by(&mut self, duration: Duration) {
         if let PickerLoadState::Loading {
             mode,
             dir,
@@ -326,19 +326,19 @@ impl App {
         }
     }
 
-    pub(crate) fn is_fuzzy_file_picker(&self) -> bool {
+    pub fn is_fuzzy_file_picker(&self) -> bool {
         self.file_picker.mode == FilePickerMode::Fuzzy
     }
 
-    pub(crate) fn is_browser_file_picker(&self) -> bool {
+    pub fn is_browser_file_picker(&self) -> bool {
         self.file_picker.mode == FilePickerMode::Browser
     }
 
-    pub(crate) fn is_file_picker_open(&self) -> bool {
+    pub fn is_file_picker_open(&self) -> bool {
         self.file_picker.open
     }
 
-    pub(crate) fn close_file_picker(&mut self) {
+    pub fn close_file_picker(&mut self) {
         self.file_picker.open = false;
         self.file_picker.query.clear();
         self.file_picker.entries.clear();
@@ -348,24 +348,24 @@ impl App {
         self.file_picker.truncation = None;
     }
 
-    pub(crate) fn cancel_picker_loading(&mut self) {
+    pub fn cancel_picker_loading(&mut self) {
         self.picker_load_state = PickerLoadState::Idle;
         self.pending_picker = PendingPicker::None;
     }
 
-    pub(crate) fn file_picker_dir(&self) -> &std::path::Path {
+    pub fn file_picker_dir(&self) -> &std::path::Path {
         &self.file_picker.dir
     }
 
-    pub(crate) fn file_picker_entries(&self) -> &[FilePickerEntry] {
+    pub fn file_picker_entries(&self) -> &[FilePickerEntry] {
         &self.file_picker.entries
     }
 
-    pub(crate) fn file_picker_filtered_indices(&self) -> &[usize] {
+    pub fn file_picker_filtered_indices(&self) -> &[usize] {
         &self.file_picker.filtered
     }
 
-    pub(crate) fn file_picker_match_positions(&self, filtered_idx: usize) -> &[usize] {
+    pub fn file_picker_match_positions(&self, filtered_idx: usize) -> &[usize] {
         self.file_picker
             .match_positions
             .get(filtered_idx)
@@ -373,19 +373,19 @@ impl App {
             .unwrap_or(&[])
     }
 
-    pub(crate) fn file_picker_index(&self) -> usize {
+    pub fn file_picker_index(&self) -> usize {
         self.file_picker.index
     }
 
-    pub(crate) fn file_picker_query(&self) -> &str {
+    pub fn file_picker_query(&self) -> &str {
         &self.file_picker.query
     }
 
-    pub(crate) fn file_picker_truncation(&self) -> Option<PickerIndexTruncation> {
+    pub fn file_picker_truncation(&self) -> Option<PickerIndexTruncation> {
         self.file_picker.truncation
     }
 
-    pub(crate) fn move_file_picker_up(&mut self) {
+    pub fn move_file_picker_up(&mut self) {
         let total = self.file_picker.filtered.len();
         if total == 0 {
             return;
@@ -397,7 +397,7 @@ impl App {
         }
     }
 
-    pub(crate) fn move_file_picker_down(&mut self) {
+    pub fn move_file_picker_down(&mut self) {
         let total = self.file_picker.filtered.len();
         if total == 0 {
             return;
@@ -405,7 +405,7 @@ impl App {
         self.file_picker.index = (self.file_picker.index + 1) % total;
     }
 
-    pub(crate) fn push_file_picker_query(&mut self, ch: char) {
+    pub fn push_file_picker_query(&mut self, ch: char) {
         if self.is_browser_file_picker() {
             return;
         }
@@ -413,7 +413,7 @@ impl App {
         self.refresh_file_picker_matches();
     }
 
-    pub(crate) fn pop_file_picker_query(&mut self) {
+    pub fn pop_file_picker_query(&mut self) {
         if self.is_browser_file_picker() {
             return;
         }
@@ -421,7 +421,7 @@ impl App {
         self.refresh_file_picker_matches();
     }
 
-    pub(crate) fn clear_file_picker_query(&mut self) {
+    pub fn clear_file_picker_query(&mut self) {
         if self.is_browser_file_picker() {
             return;
         }
@@ -429,7 +429,7 @@ impl App {
         self.refresh_file_picker_matches();
     }
 
-    pub(crate) fn open_file_picker_parent(&mut self) -> bool {
+    pub fn open_file_picker_parent(&mut self) -> bool {
         if self.is_fuzzy_file_picker() {
             return false;
         }
@@ -439,7 +439,7 @@ impl App {
         self.open_file_picker(parent.to_path_buf())
     }
 
-    pub(crate) fn activate_file_picker_selection(
+    pub fn activate_file_picker_selection(
         &mut self,
         ss: &SyntaxSet,
         themes: &ThemeSet,

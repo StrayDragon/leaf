@@ -50,7 +50,7 @@ pub(super) fn overlapping_ranges(ranges: &[Range<usize>], start: usize, end: usi
     ranges.iter().any(|r| r.start < end && r.end > start)
 }
 
-pub(crate) fn highlight_line<'a>(line: &Line<'a>, theme: &MarkdownTheme, query: &str) -> Line<'a> {
+pub fn highlight_line<'a>(line: &Line<'a>, theme: &MarkdownTheme, query: &str) -> Line<'a> {
     let spans = &line.spans;
     let content_start = content_span_start(spans);
 

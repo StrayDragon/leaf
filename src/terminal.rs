@@ -10,7 +10,7 @@ use crossterm::{
 use ratatui::{backend::CrosstermBackend, Terminal};
 use std::io;
 
-pub(crate) struct TerminalSession {
+pub struct TerminalSession {
     raw_enabled: bool,
     screen_enabled: bool,
     synchronized_update: bool,
@@ -18,7 +18,7 @@ pub(crate) struct TerminalSession {
     mouse_capture_enabled: bool,
 }
 
-pub(crate) fn cleanup_terminal_state<F, G>(
+pub fn cleanup_terminal_state<F, G>(
     screen_enabled: &mut bool,
     raw_enabled: &mut bool,
     mut leave_screen: F,
@@ -54,7 +54,7 @@ where
 }
 
 impl TerminalSession {
-    pub(crate) fn enter(stdout: &mut io::Stdout) -> Result<Self> {
+    pub fn enter(stdout: &mut io::Stdout) -> Result<Self> {
         enable_raw_mode()?;
         let mut session = Self {
             raw_enabled: true,
@@ -73,7 +73,7 @@ impl TerminalSession {
         Ok(session)
     }
 
-    pub(crate) fn finish_initial_draw(
+    pub fn finish_initial_draw(
         &mut self,
         terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     ) -> Result<()> {
@@ -84,7 +84,7 @@ impl TerminalSession {
         Ok(())
     }
 
-    pub(crate) fn restore(
+    pub fn restore(
         &mut self,
         terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     ) -> Result<()> {
@@ -147,7 +147,7 @@ impl Drop for TerminalSession {
     }
 }
 
-pub(crate) fn finish_with_restore(
+pub fn finish_with_restore(
     run_result: Result<()>,
     restore_result: Result<()>,
 ) -> Result<()> {

@@ -1,7 +1,7 @@
 use super::App;
 use crate::markdown::hash_str;
 
-pub(crate) struct SearchState {
+pub struct SearchState {
     pub(super) mode: bool,
     pub(super) draft: String,
     pub(super) query: String,
@@ -12,7 +12,7 @@ pub(crate) struct SearchState {
 }
 
 impl App {
-    pub(crate) fn active_highlight_line(&self) -> Option<usize> {
+    pub fn active_highlight_line(&self) -> Option<usize> {
         if self.search.matches.is_empty() {
             None
         } else {
@@ -20,54 +20,54 @@ impl App {
         }
     }
 
-    pub(crate) fn is_search_mode(&self) -> bool {
+    pub fn is_search_mode(&self) -> bool {
         self.search.mode
     }
 
-    pub(crate) fn search_draft(&self) -> &str {
+    pub fn search_draft(&self) -> &str {
         &self.search.draft
     }
 
-    pub(crate) fn search_query(&self) -> &str {
+    pub fn search_query(&self) -> &str {
         &self.search.query
     }
 
     #[cfg(test)]
-    pub(crate) fn set_search_query(&mut self, query: impl Into<String>) {
+    pub fn set_search_query(&mut self, query: impl Into<String>) {
         self.search.query = query.into();
         self.search.query_hash = hash_str(&self.search.query);
     }
 
-    pub(crate) fn search_match_count(&self) -> usize {
+    pub fn search_match_count(&self) -> usize {
         self.search.matches.len()
     }
 
-    pub(crate) fn search_index(&self) -> usize {
+    pub fn search_index(&self) -> usize {
         self.search.idx
     }
 
     #[cfg(test)]
-    pub(crate) fn search_matches(&self) -> &[usize] {
+    pub fn search_matches(&self) -> &[usize] {
         &self.search.matches
     }
 
     #[cfg(test)]
-    pub(crate) fn set_search_draft(&mut self, draft: impl Into<String>) {
+    pub fn set_search_draft(&mut self, draft: impl Into<String>) {
         self.search.draft = draft.into();
         self.search.draft_hash = hash_str(&self.search.draft);
     }
 
-    pub(crate) fn pop_search_draft(&mut self) {
+    pub fn pop_search_draft(&mut self) {
         self.search.draft.pop();
         self.search.draft_hash = hash_str(&self.search.draft);
     }
 
-    pub(crate) fn push_search_draft(&mut self, ch: char) {
+    pub fn push_search_draft(&mut self, ch: char) {
         self.search.draft.push(ch);
         self.search.draft_hash = hash_str(&self.search.draft);
     }
 
-    pub(crate) fn run_search(&mut self) {
+    pub fn run_search(&mut self) {
         let q = self.search.query.to_lowercase();
         if q.is_empty() {
             return;
@@ -87,7 +87,7 @@ impl App {
         }
     }
 
-    pub(crate) fn begin_search(&mut self) {
+    pub fn begin_search(&mut self) {
         self.reset_numkey_state();
         self.search.mode = true;
         self.search.draft = self.search.query.clone();
@@ -104,7 +104,7 @@ impl App {
         );
     }
 
-    pub(crate) fn reset_search_state(&mut self) {
+    pub fn reset_search_state(&mut self) {
         self.search.draft.clear();
         self.search.query.clear();
         self.search.matches.clear();
@@ -113,13 +113,13 @@ impl App {
         self.search.query_hash = 0;
     }
 
-    pub(crate) fn cancel_search(&mut self) {
+    pub fn cancel_search(&mut self) {
         self.search.mode = false;
         self.reset_search_state();
         crate::runtime::debug_log(self.debug_input, "cancel_search cleared query and matches");
     }
 
-    pub(crate) fn confirm_search(&mut self) {
+    pub fn confirm_search(&mut self) {
         self.search.mode = false;
         let draft = std::mem::take(&mut self.search.draft);
         self.search.query = draft;
@@ -146,7 +146,7 @@ impl App {
         );
     }
 
-    pub(crate) fn clear_active_search(&mut self) {
+    pub fn clear_active_search(&mut self) {
         self.search.mode = false;
         self.reset_search_state();
         crate::runtime::debug_log(
@@ -155,11 +155,11 @@ impl App {
         );
     }
 
-    pub(crate) fn has_active_search(&self) -> bool {
+    pub fn has_active_search(&self) -> bool {
         !self.search.query.is_empty() || !self.search.matches.is_empty()
     }
 
-    pub(crate) fn next_match(&mut self) {
+    pub fn next_match(&mut self) {
         if self.search.matches.is_empty() {
             return;
         }
@@ -168,7 +168,7 @@ impl App {
         self.scroll = self.search.matches[self.search.idx].min(self.max_scroll());
     }
 
-    pub(crate) fn prev_match(&mut self) {
+    pub fn prev_match(&mut self) {
         if self.search.matches.is_empty() {
             return;
         }

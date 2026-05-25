@@ -2,12 +2,12 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum EditorKind {
+pub enum EditorKind {
     Terminal,
     Gui,
 }
 
-pub(crate) fn binary_name(editor_cmd: &str) -> &str {
+pub fn binary_name(editor_cmd: &str) -> &str {
     let (bin, _) = split_editor_cmd(editor_cmd);
     let after_sep = bin
         .rsplit_once(['/', '\\'])
@@ -16,7 +16,7 @@ pub(crate) fn binary_name(editor_cmd: &str) -> &str {
     after_sep.strip_suffix(".exe").unwrap_or(after_sep)
 }
 
-pub(crate) fn classify(editor_cmd: &str) -> EditorKind {
+pub fn classify(editor_cmd: &str) -> EditorKind {
     match binary_name(editor_cmd) {
         "code" | "codium" | "subl" | "gedit" | "kate" | "mousepad" | "notepad" | "notepad++"
         | "zed" | "xjed" | "termux-open" => EditorKind::Gui,
@@ -24,7 +24,7 @@ pub(crate) fn classify(editor_cmd: &str) -> EditorKind {
     }
 }
 
-pub(crate) fn split_editor_cmd(cmd: &str) -> (&str, Vec<&str>) {
+pub fn split_editor_cmd(cmd: &str) -> (&str, Vec<&str>) {
     let trimmed = cmd.trim();
 
     for quote in ['"', '\''] {
@@ -70,10 +70,10 @@ pub(crate) fn split_editor_cmd(cmd: &str) -> (&str, Vec<&str>) {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct EditorEntry {
-    pub(crate) name: String,
-    pub(crate) command: String,
-    pub(crate) kind: EditorKind,
+pub struct EditorEntry {
+    pub name: String,
+    pub command: String,
+    pub kind: EditorKind,
 }
 
 const KNOWN_EDITORS: &[(&str, EditorKind)] = &[
@@ -97,7 +97,7 @@ const KNOWN_EDITORS: &[(&str, EditorKind)] = &[
     ("notepad++", EditorKind::Gui),
 ];
 
-pub(crate) fn which(bin: &str) -> Option<PathBuf> {
+pub fn which(bin: &str) -> Option<PathBuf> {
     if bin.contains('/') || bin.contains('\\') {
         let p = Path::new(bin);
         return p.is_file().then(|| p.to_path_buf());
@@ -125,7 +125,7 @@ pub(crate) fn which(bin: &str) -> Option<PathBuf> {
     })
 }
 
-pub(crate) fn scan_available_editors() -> Vec<EditorEntry> {
+pub fn scan_available_editors() -> Vec<EditorEntry> {
     let mut found = Vec::new();
     let is_termux = std::env::var("TERMUX_VERSION").is_ok();
 
@@ -158,7 +158,7 @@ pub(crate) fn scan_available_editors() -> Vec<EditorEntry> {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) enum TerminalEmulator {
+pub enum TerminalEmulator {
     Kitty,
     GnomeTerminal,
     MacTerminal(String),
@@ -167,7 +167,7 @@ pub(crate) enum TerminalEmulator {
     Unknown,
 }
 
-pub(crate) fn detect_terminal_emulator() -> TerminalEmulator {
+pub fn detect_terminal_emulator() -> TerminalEmulator {
     if std::env::var("KITTY_PID").is_ok() {
         return TerminalEmulator::Kitty;
     }
@@ -193,7 +193,7 @@ pub(crate) fn detect_terminal_emulator() -> TerminalEmulator {
     TerminalEmulator::Unknown
 }
 
-pub(crate) fn resolve_editor(cli_editor: Option<&str>, config_editor: Option<&str>) -> String {
+pub fn resolve_editor(cli_editor: Option<&str>, config_editor: Option<&str>) -> String {
     let raw = if let Some(e) = cli_editor {
         e.to_string()
     } else if let Some(e) = std::env::var("LEAF_EDITOR").ok().filter(|s| !s.is_empty()) {
@@ -213,7 +213,7 @@ fn expand_editor_alias(editor: &str) -> String {
     }
 }
 
-pub(crate) fn resolve_fallback_editor(editor_cmd: &str) -> Option<&'static str> {
+pub fn resolve_fallback_editor(editor_cmd: &str) -> Option<&'static str> {
     let fallback = platform_fallback_editor();
     if binary_name(editor_cmd) != binary_name(fallback) {
         Some(fallback)
@@ -230,7 +230,7 @@ fn platform_fallback_editor() -> &'static str {
     }
 }
 
-pub(crate) fn try_new_tab_command(
+pub fn try_new_tab_command(
     editor: &str,
     file: &Path,
     emulator: &TerminalEmulator,
@@ -304,12 +304,12 @@ pub(crate) fn try_new_tab_command(
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum EditorResult {
+pub enum EditorResult {
     Opened,
     NeedsSameTerminal,
 }
 
-pub(crate) fn open_in_editor(
+pub fn open_in_editor(
     editor: &str,
     file: &Path,
     kind: EditorKind,

@@ -11,11 +11,11 @@ pub(super) fn link_spans_to_map(link_spans: Vec<LinkSpan>) -> HashMap<usize, Vec
 }
 
 impl App {
-    pub(crate) fn set_link_spans(&mut self, link_spans: Vec<LinkSpan>) {
+    pub fn set_link_spans(&mut self, link_spans: Vec<LinkSpan>) {
         self.link_spans_by_line = link_spans_to_map(link_spans);
     }
 
-    pub(crate) fn link_at_position(
+    pub fn link_at_position(
         &self,
         col: u16,
         row: u16,
@@ -30,7 +30,7 @@ impl App {
             })
     }
 
-    pub(crate) fn find_hovered_link(
+    pub fn find_hovered_link(
         &self,
         col: u16,
         row: u16,

@@ -8,7 +8,7 @@ use std::fmt;
 use super::{resolution::parse_theme_color, MarkdownTheme, UiTheme};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct ThemeColor(pub(crate) Color);
+pub struct ThemeColor(pub Color);
 
 impl<'de> Deserialize<'de> for ThemeColor {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -75,8 +75,8 @@ macro_rules! theme_overrides {
     ($name:ident for $theme:ty { $($field:ident),+ $(,)? }) => {
         #[derive(Clone, Debug, Default, Deserialize, PartialEq, Eq)]
         #[serde(default)]
-        pub(crate) struct $name {
-            $(pub(crate) $field: Option<ThemeColor>,)+
+        pub struct $name {
+            $(pub $field: Option<ThemeColor>,)+
         }
 
         impl $name {
@@ -177,9 +177,9 @@ theme_overrides!(MarkdownThemeOverrides for MarkdownTheme {
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Eq)]
 #[serde(default)]
-pub(crate) struct CustomThemeConfig {
-    pub(crate) base: Option<String>,
-    pub(crate) syntax: Option<String>,
-    pub(crate) ui: UiThemeOverrides,
-    pub(crate) markdown: MarkdownThemeOverrides,
+pub struct CustomThemeConfig {
+    pub base: Option<String>,
+    pub syntax: Option<String>,
+    pub ui: UiThemeOverrides,
+    pub markdown: MarkdownThemeOverrides,
 }

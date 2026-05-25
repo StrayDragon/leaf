@@ -10,25 +10,25 @@ const MAX_FUZZY_PICKER_FILES_INDEXED: usize = 10_000;
 const MAX_FUZZY_PICKER_INDEX_DURATION: std::time::Duration = std::time::Duration::from_secs(5);
 
 impl App {
-    pub(crate) fn is_markdown_extension(ext: &str) -> bool {
+    pub fn is_markdown_extension(ext: &str) -> bool {
         matches!(
             ext.to_ascii_lowercase().as_str(),
             "md" | "markdown" | "mdown" | "mkd"
         )
     }
 
-    pub(crate) fn has_code_syntax(ext: &str, ss: &SyntaxSet) -> bool {
+    pub fn has_code_syntax(ext: &str, ss: &SyntaxSet) -> bool {
         let plain = ss.find_syntax_plain_text();
         ss.find_syntax_by_extension(ext)
             .or_else(|| ss.find_syntax_by_token(ext))
             .is_some_and(|s| s.name != plain.name)
     }
 
-    pub(crate) fn fence_wrap(src: &str, ext: &str) -> String {
+    pub fn fence_wrap(src: &str, ext: &str) -> String {
         format!("````{ext}\n{src}\n````")
     }
 
-    pub(crate) fn wrap_as_code_block(src: String, ext: &str, ss: &SyntaxSet) -> (String, bool) {
+    pub fn wrap_as_code_block(src: String, ext: &str, ss: &SyntaxSet) -> (String, bool) {
         if Self::is_markdown_extension(ext) || !Self::has_code_syntax(ext, ss) {
             (src, false)
         } else {
@@ -258,7 +258,7 @@ impl App {
         true
     }
 
-    pub(crate) fn start_pending_picker_loading(&mut self) -> bool {
+    pub fn start_pending_picker_loading(&mut self) -> bool {
         use super::file_picker::PendingPicker;
 
         if !self.has_pending_picker() || !matches!(self.picker_load_state, PickerLoadState::Idle) {

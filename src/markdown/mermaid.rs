@@ -3,7 +3,7 @@ use mmdflux::{render_diagram, OutputFormat, RenderConfig};
 use ratatui::{style::Style, text::Span};
 use std::fmt::Write;
 
-pub(crate) fn render(content: &str) -> Option<String> {
+pub fn render(content: &str) -> Option<String> {
     let trimmed = content.trim();
     if trimmed.is_empty() {
         return None;
@@ -79,7 +79,7 @@ fn render_pie(content: &str) -> Option<String> {
     Some(out)
 }
 
-pub(crate) fn colorize_line(line: &str, theme: &MarkdownTheme) -> Vec<Span<'static>> {
+pub fn colorize_line(line: &str, theme: &MarkdownTheme) -> Vec<Span<'static>> {
     let keyword_style = Style::default().fg(theme.mermaid_keyword);
     let arrow_style = Style::default().fg(theme.mermaid_arrow);
     let label_style = Style::default().fg(theme.mermaid_label);

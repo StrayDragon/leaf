@@ -12,7 +12,7 @@ use super::{
     DEFAULT_PRESET,
 };
 
-pub(crate) fn parse_theme_color(value: &str) -> Option<Color> {
+pub fn parse_theme_color(value: &str) -> Option<Color> {
     let value = value.trim();
     if value.is_empty() {
         return None;
@@ -62,7 +62,7 @@ pub(super) fn parse_rgb_color(value: &str) -> Option<Color> {
     Some(Color::Rgb(r, g, b))
 }
 
-pub(crate) fn resolve_theme_selection(
+pub fn resolve_theme_selection(
     name: &str,
     custom_themes: &BTreeMap<String, CustomThemeConfig>,
     theme_file_base_dir: Option<&Path>,
@@ -146,7 +146,7 @@ pub(super) fn resolve_theme_file_path(name: &str, theme_file_base_dir: Option<&P
         .unwrap_or_else(|| path.to_path_buf())
 }
 
-pub(crate) fn validate_theme_syntax(
+pub fn validate_theme_syntax(
     selection: &ThemeSelection,
     themes: &ThemeSet,
 ) -> Option<String> {

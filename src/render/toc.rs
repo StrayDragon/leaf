@@ -49,7 +49,7 @@ pub(super) fn render_toc_panel(f: &mut Frame, app: &mut App, area: Rect) {
     );
 }
 
-pub(crate) fn toc_header_line() -> Line<'static> {
+pub fn toc_header_line() -> Line<'static> {
     let theme = app_theme();
     Line::from(vec![Span::styled(
         "  TABLE OF CONTENTS",
@@ -60,7 +60,7 @@ pub(crate) fn toc_header_line() -> Line<'static> {
     )])
 }
 
-pub(crate) fn build_toc_line_with_index(
+pub fn build_toc_line_with_index(
     entry: &crate::markdown::toc::TocEntry,
     display_level: u8,
     top_level_index: Option<usize>,

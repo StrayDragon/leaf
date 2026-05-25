@@ -27,7 +27,7 @@ struct GithubAsset {
     browser_download_url: String,
 }
 
-pub(crate) fn run_update() -> Result<()> {
+pub fn run_update() -> Result<()> {
     println!("Updating leaf...");
 
     let current_version = env!("CARGO_PKG_VERSION");
@@ -76,7 +76,7 @@ fn current_asset_name() -> Result<&'static str> {
     })
 }
 
-pub(crate) fn asset_name_for_target(os: &str, arch: &str) -> Option<&'static str> {
+pub fn asset_name_for_target(os: &str, arch: &str) -> Option<&'static str> {
     match (os, arch) {
         ("macos", "x86_64") => Some("leaf-macos-x86_64"),
         ("macos", "aarch64") => Some("leaf-macos-arm64"),
@@ -120,7 +120,7 @@ fn fetch_release_from(base_url: &str) -> Result<GithubRelease> {
         .context("Cannot parse GitHub release metadata")
 }
 
-pub(crate) fn expected_asset_download_url<'a>(
+pub fn expected_asset_download_url<'a>(
     tag_name: &str,
     assets: &'a [impl AsRefAsset],
     expected_asset: &str,
@@ -133,7 +133,7 @@ pub(crate) fn expected_asset_download_url<'a>(
         .ok_or_else(|| anyhow::anyhow!("Release does not contain asset {expected_asset}"))
 }
 
-pub(crate) trait AsRefAsset {
+pub trait AsRefAsset {
     fn name(&self) -> &str;
     fn download_url(&self) -> &str;
 }
@@ -148,7 +148,7 @@ impl AsRefAsset for GithubAsset {
     }
 }
 
-pub(crate) fn is_newer_version(current: &str, remote: &str) -> Result<bool> {
+pub fn is_newer_version(current: &str, remote: &str) -> Result<bool> {
     let current = Version::parse(normalize_version_tag(current))
         .with_context(|| format!("Invalid current version: {current}"))?;
     let remote = Version::parse(normalize_version_tag(remote))
@@ -224,7 +224,7 @@ fn validate_download_response(
     Ok(content_length)
 }
 
-pub(crate) fn validate_download_size(expected: Option<u64>, actual: u64) -> Result<()> {
+pub fn validate_download_size(expected: Option<u64>, actual: u64) -> Result<()> {
     if actual == 0 {
         bail!("Downloaded release asset is empty");
     }
@@ -238,7 +238,7 @@ pub(crate) fn validate_download_size(expected: Option<u64>, actual: u64) -> Resu
     Ok(())
 }
 
-pub(crate) fn find_expected_checksum<'a>(checksums: &'a str, asset_name: &str) -> Result<&'a str> {
+pub fn find_expected_checksum<'a>(checksums: &'a str, asset_name: &str) -> Result<&'a str> {
     for line in checksums.lines() {
         let trimmed = line.trim();
         if trimmed.is_empty() {
@@ -261,7 +261,7 @@ pub(crate) fn find_expected_checksum<'a>(checksums: &'a str, asset_name: &str) -
     bail!("checksums.txt does not contain {asset_name}")
 }
 
-pub(crate) fn validate_sha256_hex(value: &str) -> Result<()> {
+pub fn validate_sha256_hex(value: &str) -> Result<()> {
     if value.len() != 64 || !value.bytes().all(|byte| byte.is_ascii_hexdigit()) {
         bail!("Invalid SHA256 checksum format");
     }
@@ -368,15 +368,15 @@ impl Drop for TempFileGuard {
 }
 
 #[cfg(test)]
-pub(crate) use test_support::TestAsset;
+pub use test_support::TestAsset;
 
 #[cfg(test)]
 mod test_support {
     use super::AsRefAsset;
 
-    pub(crate) struct TestAsset<'a> {
-        pub(crate) name: &'a str,
-        pub(crate) download_url: &'a str,
+    pub struct TestAsset<'a> {
+        pub name: &'a str,
+        pub download_url: &'a str,
     }
 
     impl AsRefAsset for TestAsset<'_> {

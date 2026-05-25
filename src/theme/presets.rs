@@ -172,13 +172,13 @@ pub(super) const BASE_DARK_MARKDOWN: MarkdownTheme = MarkdownTheme {
     alert_caution: Color::Rgb(218, 95, 95),
 };
 
-pub(crate) const ARCTIC_THEME: AppTheme = AppTheme {
+pub const ARCTIC_THEME: AppTheme = AppTheme {
     syntax_theme_name: Cow::Borrowed("base16-ocean.light"),
     ui: BASE_LIGHT_UI,
     markdown: BASE_LIGHT_MARKDOWN,
 };
 
-pub(crate) const FOREST_THEME: AppTheme = AppTheme {
+pub const FOREST_THEME: AppTheme = AppTheme {
     syntax_theme_name: Cow::Borrowed("InspiredGitHub"),
     ui: UiTheme {
         toc_bg: Color::Rgb(16, 22, 18),
@@ -264,13 +264,13 @@ pub(crate) const FOREST_THEME: AppTheme = AppTheme {
     },
 };
 
-pub(crate) const OCEAN_DARK_THEME: AppTheme = AppTheme {
+pub const OCEAN_DARK_THEME: AppTheme = AppTheme {
     syntax_theme_name: Cow::Borrowed("base16-ocean.dark"),
     ui: BASE_DARK_UI,
     markdown: BASE_DARK_MARKDOWN,
 };
 
-pub(crate) const SOLARIZED_DARK_THEME: AppTheme = AppTheme {
+pub const SOLARIZED_DARK_THEME: AppTheme = AppTheme {
     syntax_theme_name: Cow::Borrowed("Solarized (dark)"),
     ui: UiTheme {
         toc_bg: Color::Rgb(7, 54, 66),

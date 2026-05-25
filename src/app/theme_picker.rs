@@ -11,12 +11,12 @@ use syntect::{highlighting::ThemeSet, parsing::SyntaxSet};
 use super::App;
 
 #[derive(Clone)]
-pub(crate) struct ThemePreviewCacheEntry {
+pub struct ThemePreviewCacheEntry {
     pub(super) lines: Vec<Line<'static>>,
     pub(super) toc: Vec<TocEntry>,
 }
 
-pub(crate) struct ThemePickerState {
+pub struct ThemePickerState {
     pub(super) open: bool,
     pub(super) index: usize,
     pub(super) original: Option<ThemeSelection>,
@@ -25,7 +25,7 @@ pub(crate) struct ThemePickerState {
 }
 
 impl App {
-    pub(crate) fn open_theme_picker(&mut self) {
+    pub fn open_theme_picker(&mut self) {
         self.theme_picker.open = true;
         let current = current_theme_selection();
         self.theme_picker.index = theme_preset_index(current.preset_hint());
@@ -37,26 +37,26 @@ impl App {
         self.store_current_theme_preview();
     }
 
-    pub(crate) fn close_theme_picker(&mut self) {
+    pub fn close_theme_picker(&mut self) {
         self.theme_picker.open = false;
         self.theme_picker.original = None;
         self.theme_picker.original_preview = None;
     }
 
-    pub(crate) fn is_theme_picker_open(&self) -> bool {
+    pub fn is_theme_picker_open(&self) -> bool {
         self.theme_picker.open
     }
 
-    pub(crate) fn theme_picker_index(&self) -> usize {
+    pub fn theme_picker_index(&self) -> usize {
         self.theme_picker.index
     }
 
     #[cfg(test)]
-    pub(crate) fn theme_picker_original(&self) -> Option<ThemeSelection> {
+    pub fn theme_picker_original(&self) -> Option<ThemeSelection> {
         self.theme_picker.original.clone()
     }
 
-    pub(crate) fn theme_picker_reference_preset(&self) -> Option<ThemePreset> {
+    pub fn theme_picker_reference_preset(&self) -> Option<ThemePreset> {
         self.theme_picker
             .original
             .as_ref()
@@ -64,7 +64,7 @@ impl App {
             .or_else(|| current_theme_selection().as_preset())
     }
 
-    pub(crate) fn move_theme_picker_up(&mut self) {
+    pub fn move_theme_picker_up(&mut self) {
         let total = THEME_PRESETS.len();
         if total == 0 {
             return;
@@ -76,7 +76,7 @@ impl App {
         }
     }
 
-    pub(crate) fn move_theme_picker_down(&mut self) {
+    pub fn move_theme_picker_down(&mut self) {
         let total = THEME_PRESETS.len();
         if total == 0 {
             return;
@@ -84,7 +84,7 @@ impl App {
         self.theme_picker.index = (self.theme_picker.index + 1) % total;
     }
 
-    pub(crate) fn set_theme_picker_index(&mut self, idx: usize) -> bool {
+    pub fn set_theme_picker_index(&mut self, idx: usize) -> bool {
         if idx < THEME_PRESETS.len() {
             self.theme_picker.index = idx;
             true
@@ -93,11 +93,11 @@ impl App {
         }
     }
 
-    pub(crate) fn selected_theme_preset(&self) -> Option<ThemePreset> {
+    pub fn selected_theme_preset(&self) -> Option<ThemePreset> {
         THEME_PRESETS.get(self.theme_picker.index).copied()
     }
 
-    pub(crate) fn preview_theme_preset(
+    pub fn preview_theme_preset(
         &mut self,
         preset: ThemePreset,
         ss: &SyntaxSet,
@@ -132,7 +132,7 @@ impl App {
         self.replace_content(new_lines, new_toc, link_spans);
     }
 
-    pub(crate) fn restore_theme_picker_preview(&mut self, ss: &SyntaxSet, themes: &ThemeSet) {
+    pub fn restore_theme_picker_preview(&mut self, ss: &SyntaxSet, themes: &ThemeSet) {
         if let Some(original) = self.theme_picker.original.take() {
             set_theme_selection(original);
             if let Some(entry) = self.theme_picker.original_preview.take() {
@@ -154,7 +154,7 @@ impl App {
         self.close_theme_picker();
     }
 
-    pub(crate) fn store_theme_preview(
+    pub fn store_theme_preview(
         &mut self,
         preset: ThemePreset,
         lines: &[Line<'static>],
@@ -169,7 +169,7 @@ impl App {
         }
     }
 
-    pub(crate) fn store_current_theme_preview(&mut self) {
+    pub fn store_current_theme_preview(&mut self) {
         let Some(preset) = current_theme_selection().as_preset() else {
             return;
         };
@@ -182,7 +182,7 @@ impl App {
         }
     }
 
-    pub(crate) fn store_current_theme_preview_from(
+    pub fn store_current_theme_preview_from(
         &mut self,
         lines: &[Line<'static>],
         toc: &[TocEntry],
@@ -193,12 +193,12 @@ impl App {
         self.store_theme_preview(preset, lines, toc);
     }
 
-    pub(crate) fn invalidate_theme_preview_cache(&mut self) {
+    pub fn invalidate_theme_preview_cache(&mut self) {
         self.theme_picker.preview_cache.fill(None);
     }
 
     #[cfg(test)]
-    pub(crate) fn has_cached_theme_preview(&self, preset: ThemePreset) -> bool {
+    pub fn has_cached_theme_preview(&self, preset: ThemePreset) -> bool {
         self.theme_picker
             .preview_cache
             .get(theme_preset_index(preset))

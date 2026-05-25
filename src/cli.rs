@@ -3,29 +3,29 @@ use anyhow::{bail, Result};
 use crate::inline::{self, InlineSpec};
 
 #[derive(Debug, PartialEq, Eq)]
-pub(crate) struct AutoCompleteArg {
-    pub(crate) shell: Option<String>,
-    pub(crate) dump: bool,
+pub struct AutoCompleteArg {
+    pub shell: Option<String>,
+    pub dump: bool,
 }
 
 #[derive(Debug, Default, PartialEq, Eq)]
-pub(crate) struct CliOptions {
-    pub(crate) picker: bool,
-    pub(crate) watch: bool,
-    pub(crate) update: bool,
-    pub(crate) config: bool,
-    pub(crate) auto_complete: Option<AutoCompleteArg>,
-    pub(crate) debug_input: bool,
-    pub(crate) print_help: bool,
-    pub(crate) print_version: bool,
-    pub(crate) file_arg: Option<String>,
-    pub(crate) theme: Option<String>,
-    pub(crate) editor: Option<String>,
-    pub(crate) inline: Option<InlineSpec>,
-    pub(crate) width: Option<usize>,
+pub struct CliOptions {
+    pub picker: bool,
+    pub watch: bool,
+    pub update: bool,
+    pub config: bool,
+    pub auto_complete: Option<AutoCompleteArg>,
+    pub debug_input: bool,
+    pub print_help: bool,
+    pub print_version: bool,
+    pub file_arg: Option<String>,
+    pub theme: Option<String>,
+    pub editor: Option<String>,
+    pub inline: Option<InlineSpec>,
+    pub width: Option<usize>,
 }
 
-pub(crate) fn usage_text() -> &'static str {
+pub fn usage_text() -> &'static str {
     "Usage:  leaf [OPTIONS] [file.md | directory]\n\
      \x20       leaf [--watch] --picker\n\
      \x20       leaf --update\n\
@@ -45,19 +45,19 @@ pub(crate) fn usage_text() -> &'static str {
      \x20     --auto-complete [SPEC]   Install or dump shell completions [bash|zsh|fish|powershell][:dump]"
 }
 
-pub(crate) fn version_text() -> &'static str {
+pub fn version_text() -> &'static str {
     concat!("leaf ", env!("CARGO_PKG_VERSION"))
 }
 
-pub(crate) fn print_usage() {
+pub fn print_usage() {
     println!("{}", usage_text());
 }
 
-pub(crate) fn print_version() {
+pub fn print_version() {
     println!("{}", version_text());
 }
 
-pub(crate) fn parse_cli(args: &[String]) -> Result<CliOptions> {
+pub fn parse_cli(args: &[String]) -> Result<CliOptions> {
     let mut options = CliOptions::default();
     let mut positional_only = false;
     let mut iter = args.iter().skip(1).peekable();

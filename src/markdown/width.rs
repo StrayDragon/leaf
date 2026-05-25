@@ -3,7 +3,7 @@ use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 
 pub(super) const TAB_STOP: usize = 4;
 
-pub(crate) fn line_plain_text(line: &Line<'_>) -> String {
+pub fn line_plain_text(line: &Line<'_>) -> String {
     line.spans.iter().map(|s| s.content.as_ref()).collect()
 }
 
@@ -25,7 +25,7 @@ pub(super) fn is_code_gutter_span(content: &str) -> bool {
     }
 }
 
-pub(crate) fn line_searchable_text(line: &Line<'_>) -> String {
+pub fn line_searchable_text(line: &Line<'_>) -> String {
     use super::LINK_MARKER;
 
     fn collect_filtered(spans: &[ratatui::text::Span<'_>]) -> String {
@@ -64,11 +64,11 @@ pub(crate) fn line_searchable_text(line: &Line<'_>) -> String {
     collect_filtered(&spans[start..end])
 }
 
-pub(crate) fn build_searchable_lines(lines: &[Line<'_>]) -> Vec<String> {
+pub fn build_searchable_lines(lines: &[Line<'_>]) -> Vec<String> {
     lines.iter().map(line_searchable_text).collect()
 }
 
-pub(crate) fn truncate_display_width(text: &str, max_width: usize) -> String {
+pub fn truncate_display_width(text: &str, max_width: usize) -> String {
     if display_width(text) <= max_width {
         return text.to_string();
     }
@@ -90,7 +90,7 @@ pub(crate) fn truncate_display_width(text: &str, max_width: usize) -> String {
     out
 }
 
-pub(crate) fn display_width(text: &str) -> usize {
+pub fn display_width(text: &str) -> usize {
     let mut width = 0;
     let mut parts = text.split('\t').peekable();
     while let Some(segment) = parts.next() {

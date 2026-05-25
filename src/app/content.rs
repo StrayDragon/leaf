@@ -11,19 +11,19 @@ use syntect::{highlighting::ThemeSet, parsing::SyntaxSet};
 use crate::theme::{app_theme, current_syntect_theme};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct FileState {
-    pub(crate) modified: SystemTime,
-    pub(crate) len: u64,
+pub struct FileState {
+    pub modified: SystemTime,
+    pub len: u64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum FileChange {
+pub enum FileChange {
     Metadata(FileState),
     Content(FileState),
 }
 
 impl App {
-    pub(crate) fn replace_content(
+    pub fn replace_content(
         &mut self,
         lines: Vec<ratatui::text::Line<'static>>,
         toc: Vec<crate::markdown::toc::TocEntry>,
@@ -45,7 +45,7 @@ impl App {
         self.refresh_static_caches();
     }
 
-    pub(crate) fn reload(&mut self, ss: &SyntaxSet, themes: &ThemeSet) -> bool {
+    pub fn reload(&mut self, ss: &SyntaxSet, themes: &ThemeSet) -> bool {
         self.reset_numkey_state();
         let path = match &self.filepath {
             Some(p) => p,
@@ -74,7 +74,7 @@ impl App {
         true
     }
 
-    pub(crate) fn load_path(&mut self, path: PathBuf, ss: &SyntaxSet, themes: &ThemeSet) -> bool {
+    pub fn load_path(&mut self, path: PathBuf, ss: &SyntaxSet, themes: &ThemeSet) -> bool {
         let src = match std::fs::read_to_string(&path) {
             Ok(src) => src,
             Err(_) => return false,
@@ -123,7 +123,7 @@ impl App {
         true
     }
 
-    pub(crate) fn reparse_source(&mut self, ss: &SyntaxSet, themes: &ThemeSet) {
+    pub fn reparse_source(&mut self, ss: &SyntaxSet, themes: &ThemeSet) {
         let theme = current_syntect_theme(themes);
         let at = app_theme();
         let old_total = self.total();
@@ -151,7 +151,7 @@ impl App {
         }
     }
 
-    pub(crate) fn check_modified(&mut self) -> Option<FileChange> {
+    pub fn check_modified(&mut self) -> Option<FileChange> {
         const HASH_FALLBACK_INTERVAL: Duration = Duration::from_secs(2);
 
         let path = self.filepath.as_ref()?;
@@ -176,20 +176,20 @@ impl App {
         }
     }
 
-    pub(crate) fn request_reload(&mut self, ss: &SyntaxSet, themes: &ThemeSet) -> bool {
+    pub fn request_reload(&mut self, ss: &SyntaxSet, themes: &ThemeSet) -> bool {
         self.last_file_state = None;
         self.reload(ss, themes)
     }
 
-    pub(crate) fn set_last_content_hash(&mut self, last_content_hash: u64) {
+    pub fn set_last_content_hash(&mut self, last_content_hash: u64) {
         self.last_content_hash = last_content_hash;
     }
 
-    pub(crate) fn set_last_file_state(&mut self, state: FileState) {
+    pub fn set_last_file_state(&mut self, state: FileState) {
         self.last_file_state = Some(state);
     }
 
-    pub(crate) fn sync_render_width(
+    pub fn sync_render_width(
         &mut self,
         render_width: usize,
         ss: &SyntaxSet,

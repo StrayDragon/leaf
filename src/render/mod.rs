@@ -11,14 +11,14 @@ use ratatui::{
 };
 
 #[cfg(test)]
-pub(crate) use popup::wrap_path_lines;
-pub(crate) use status::build_status_bar;
-pub(crate) use toc::{build_toc_line_with_index, toc_header_line};
+pub use popup::wrap_path_lines;
+pub use status::build_status_bar;
+pub use toc::{build_toc_line_with_index, toc_header_line};
 
-pub(crate) const CONTENT_HORIZONTAL_PADDING: u16 = 1;
-pub(crate) const SCROLLBAR_WIDTH: u16 = 1;
+pub const CONTENT_HORIZONTAL_PADDING: u16 = 1;
+pub const SCROLLBAR_WIDTH: u16 = 1;
 
-pub(crate) fn ui(f: &mut Frame, app: &mut App) {
+pub fn ui(f: &mut Frame, app: &mut App) {
     let area = f.area();
     let root = Layout::default()
         .direction(Direction::Vertical)

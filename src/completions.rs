@@ -150,7 +150,7 @@ fn completion_content(shell: &Shell) -> &'static str {
     }
 }
 
-pub(crate) fn run_auto_complete(arg: &AutoCompleteArg) -> Result<()> {
+pub fn run_auto_complete(arg: &AutoCompleteArg) -> Result<()> {
     let shell = match &arg.shell {
         Some(name) => parse_shell(name)?,
         None => detect_shell()?,

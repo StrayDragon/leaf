@@ -12,24 +12,24 @@ const DEFAULT_CONFIG: &str = include_str!("../config.toml");
 
 #[derive(Debug, Default, Deserialize)]
 #[serde(default)]
-pub(crate) struct LeafConfig {
-    pub(crate) theme: Option<String>,
-    pub(crate) editor: Option<String>,
-    pub(crate) watch: Option<bool>,
-    pub(crate) width: Option<usize>,
-    pub(crate) extras: Vec<String>,
-    pub(crate) themes: BTreeMap<String, CustomThemeConfig>,
+pub struct LeafConfig {
+    pub theme: Option<String>,
+    pub editor: Option<String>,
+    pub watch: Option<bool>,
+    pub width: Option<usize>,
+    pub extras: Vec<String>,
+    pub themes: BTreeMap<String, CustomThemeConfig>,
     #[serde(skip)]
-    pub(crate) config_dir: Option<PathBuf>,
+    pub config_dir: Option<PathBuf>,
 }
 
 #[derive(Default)]
-pub(crate) struct CliOverrides {
-    pub(crate) width: Option<usize>,
-    pub(crate) theme: Option<String>,
+pub struct CliOverrides {
+    pub width: Option<usize>,
+    pub theme: Option<String>,
 }
 
-pub(crate) fn load_config(overrides: &CliOverrides) -> (LeafConfig, Option<String>) {
+pub fn load_config(overrides: &CliOverrides) -> (LeafConfig, Option<String>) {
     let Some(path) = config_path() else {
         return (LeafConfig::default(), None);
     };
@@ -79,7 +79,7 @@ pub(crate) fn load_config(overrides: &CliOverrides) -> (LeafConfig, Option<Strin
     (config, warning)
 }
 
-pub(crate) fn config_path() -> Option<PathBuf> {
+pub fn config_path() -> Option<PathBuf> {
     #[cfg(target_os = "windows")]
     {
         std::env::var("APPDATA")
@@ -96,7 +96,7 @@ pub(crate) fn config_path() -> Option<PathBuf> {
     }
 }
 
-pub(crate) fn run_config() -> anyhow::Result<()> {
+pub fn run_config() -> anyhow::Result<()> {
     let path = config_path().context("Cannot determine config directory")?;
 
     if !path.exists() {

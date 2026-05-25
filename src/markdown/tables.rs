@@ -201,7 +201,7 @@ impl TableBuf {
         }
     }
 
-    pub(crate) fn from_key_value_pairs(pairs: &[(String, String)], vertical: bool) -> Self {
+    pub fn from_key_value_pairs(pairs: &[(String, String)], vertical: bool) -> Self {
         let style = CellInlineStyle::default();
         if vertical {
             let alignments = vec![Alignment::None; 2];
@@ -326,7 +326,7 @@ impl TableBuf {
         self.in_header = false;
     }
 
-    pub(crate) fn render(&self, render_width: usize) -> Vec<Line<'static>> {
+    pub fn render(&self, render_width: usize) -> Vec<Line<'static>> {
         let app_theme = app_theme();
         let theme = &app_theme.markdown;
         if self.rows.is_empty() {

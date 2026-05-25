@@ -5,6 +5,10 @@ edition = "2021"
 description = "A friendly terminal Markdown previewer"
 license = "MIT"
 
+[lib]
+name = "leaf"
+path = "src/lib.rs"
+
 [[bin]]
 name = "leaf"
 path = "src/main.rs"

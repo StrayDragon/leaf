@@ -11,18 +11,26 @@ mod spans;
 mod syntax;
 mod table_layout;
 mod tables;
-pub(crate) mod toc;
-pub(crate) mod width;
+pub mod toc;
+pub mod width;
 mod wrapping;
 
-pub(crate) use highlight::highlight_line;
-pub(crate) use links::LinkSpan;
+pub use highlight::highlight_line;
+pub use links::LinkSpan;
 #[cfg(test)]
-pub(crate) use syntax::resolve_syntax;
+pub use syntax::resolve_syntax;
 use tables::{handle_table_event, start_table, TableBuf};
 #[cfg(test)]
-pub(crate) use width::line_plain_text;
-pub(crate) use width::{build_searchable_lines, display_width, truncate_display_width};
+pub use width::line_plain_text;
+pub use width::{build_searchable_lines, display_width, truncate_display_width};
+pub use toc::TocEntry;
+
+/// Structured output from Markdown parsing, replacing the raw tuple return.
+pub struct ParseOutput {
+    pub lines: Vec<Line<'static>>,
+    pub toc: Vec<TocEntry>,
+    pub links: Vec<LinkSpan>,
+}
 
 use crate::theme::MarkdownTheme;
 use pulldown_cmark::{
@@ -37,7 +45,7 @@ use std::{
     io,
     path::PathBuf,
 };
-use toc::{normalize_toc, TocEntry};
+use toc::normalize_toc;
 
 use blocks::{
     flush_wrapped_spans, push_code_block_lines, push_heading_lines, push_latex_block_lines,
@@ -63,13 +71,13 @@ enum LastBlock {
     Paragraph,
 }
 
-pub(crate) fn hash_str(text: &str) -> u64 {
+pub fn hash_str(text: &str) -> u64 {
     let mut hasher = std::collections::hash_map::DefaultHasher::new();
     text.hash(&mut hasher);
     hasher.finish()
 }
 
-pub(crate) fn read_file_state(path: &PathBuf) -> Option<crate::app::FileState> {
+pub fn read_file_state(path: &PathBuf) -> Option<crate::app::FileState> {
     let metadata = std::fs::metadata(path).ok()?;
     Some(crate::app::FileState {
         modified: metadata.modified().ok()?,
@@ -77,7 +85,7 @@ pub(crate) fn read_file_state(path: &PathBuf) -> Option<crate::app::FileState> {
     })
 }
 
-pub(crate) fn hash_file_contents(path: &PathBuf) -> io::Result<u64> {
+pub fn hash_file_contents(path: &PathBuf) -> io::Result<u64> {
     std::fs::read_to_string(path).map(|contents| hash_str(&contents))
 }
 
@@ -219,7 +227,32 @@ fn push_text_event(
     push_custom_marker_spans(text, CUSTOM_MARKERS, fallback, theme, spans);
 }
 
-pub(crate) fn parse_markdown(
+pub fn parse(
+    src: &str,
+    ss: &syntect::parsing::SyntaxSet,
+    theme: &syntect::highlighting::Theme,
+    md_theme: &MarkdownTheme,
+    file_mode: bool,
+) -> ParseOutput {
+    let (lines, toc, links) =
+        parse_markdown_with_width(src, ss, theme, DEFAULT_RENDER_WIDTH, md_theme, file_mode);
+    ParseOutput { lines, toc, links }
+}
+
+pub fn parse_with_width(
+    src: &str,
+    ss: &syntect::parsing::SyntaxSet,
+    theme: &syntect::highlighting::Theme,
+    render_width: usize,
+    md_theme: &MarkdownTheme,
+    file_mode: bool,
+) -> ParseOutput {
+    let (lines, toc, links) =
+        parse_markdown_with_width(src, ss, theme, render_width, md_theme, file_mode);
+    ParseOutput { lines, toc, links }
+}
+
+pub fn parse_markdown(
     src: &str,
     ss: &syntect::parsing::SyntaxSet,
     theme: &syntect::highlighting::Theme,
@@ -229,7 +262,7 @@ pub(crate) fn parse_markdown(
     parse_markdown_with_width(src, ss, theme, DEFAULT_RENDER_WIDTH, md_theme, file_mode)
 }
 
-pub(crate) fn parse_markdown_with_width(
+pub fn parse_markdown_with_width(
     src: &str,
     ss: &syntect::parsing::SyntaxSet,
     theme: &syntect::highlighting::Theme,

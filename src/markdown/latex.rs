@@ -1,4 +1,4 @@
-pub(crate) fn to_unicode(text: &str) -> String {
+pub fn to_unicode(text: &str) -> String {
     let preprocessed = strip_command_spaces(text);
     let converted = unicodeit::replace(&preprocessed);
     postprocess(&converted)

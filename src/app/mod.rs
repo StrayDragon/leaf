@@ -15,34 +15,34 @@ use std::{
 };
 
 mod search;
-pub(crate) use search::SearchState;
+pub use search::SearchState;
 
 mod file_picker;
 mod fuzzy;
-pub(crate) use file_picker::{FilePickerMode, FilePickerState, PickerIndexTruncation};
+pub use file_picker::{FilePickerMode, FilePickerState, PickerIndexTruncation};
 use file_picker::{PendingPicker, PickerLoadState};
 
 mod navigation;
 use navigation::NumkeyCycleState;
 
 mod content;
-pub(crate) use content::{FileChange, FileState};
+pub use content::{FileChange, FileState};
 
 mod flash;
-pub(crate) use flash::{EditorFlash, LinkFlash, PathFlash, WatchFlash, FLASH_DURATION_MS};
+pub use flash::{EditorFlash, LinkFlash, PathFlash, WatchFlash, FLASH_DURATION_MS};
 
 mod popups;
-pub(crate) use popups::{EditorPickerState, PathKind};
+pub use popups::{EditorPickerState, PathKind};
 
 mod links;
 
 mod io_picker;
 
 mod theme_picker;
-pub(crate) use theme_picker::ThemePickerState;
+pub use theme_picker::ThemePickerState;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(crate) struct StatusCacheKey {
+pub struct StatusCacheKey {
     pct: u16,
     search_mode: bool,
     search_draft_hash: u64,
@@ -63,16 +63,16 @@ pub(crate) struct StatusCacheKey {
     path_flash_active: bool,
 }
 
-pub(crate) struct AppConfig {
-    pub(crate) filename: String,
-    pub(crate) source: String,
-    pub(crate) debug_input: bool,
-    pub(crate) watch: bool,
-    pub(crate) filepath: Option<PathBuf>,
-    pub(crate) last_file_state: Option<FileState>,
+pub struct AppConfig {
+    pub filename: String,
+    pub source: String,
+    pub debug_input: bool,
+    pub watch: bool,
+    pub filepath: Option<PathBuf>,
+    pub last_file_state: Option<FileState>,
 }
 
-pub(crate) struct App {
+pub struct App {
     pub(super) lines: Vec<Line<'static>>,
     pub(super) plain_lines: Vec<String>,
     pub(super) scroll: usize,
@@ -105,22 +105,22 @@ pub(crate) struct App {
     pub(super) theme_picker: ThemePickerState,
     pub(super) editor_picker: EditorPickerState,
     pub(super) render_width: usize,
-    pub(crate) content_area: Rect,
-    pub(crate) mouse_position: (u16, u16),
-    pub(crate) scrollbar_dragging: bool,
+    pub content_area: Rect,
+    pub mouse_position: (u16, u16),
+    pub scrollbar_dragging: bool,
     pub(super) editor_config: Option<String>,
     pub(super) editor_flash: Option<(EditorFlash, Instant)>,
     watch_flash: Option<(WatchFlash, Instant)>,
     config_flash: Option<(String, Instant)>,
-    pub(crate) link_spans_by_line: HashMap<usize, Vec<LinkSpan>>,
-    pub(crate) hovered_link: Option<(usize, usize)>,
+    pub link_spans_by_line: HashMap<usize, Vec<LinkSpan>>,
+    pub hovered_link: Option<(usize, usize)>,
     link_flash: Option<(LinkFlash, Instant)>,
     path_flash: Option<(PathFlash, Instant)>,
-    pub(crate) last_click: Option<(u16, u16, Instant)>,
+    pub last_click: Option<(u16, u16, Instant)>,
     pub(super) path_copy_flash: Option<(PathKind, bool, Instant)>,
     pub(super) path_popup_hover: Option<PathKind>,
-    pub(crate) path_popup_rel_area: Option<Rect>,
-    pub(crate) path_popup_abs_area: Option<Rect>,
+    pub path_popup_rel_area: Option<Rect>,
+    pub path_popup_abs_area: Option<Rect>,
     numkey_cycle: Option<NumkeyCycleState>,
     reverse_mode: bool,
     pub(super) file_mode: bool,
@@ -129,7 +129,7 @@ pub(crate) struct App {
 
 impl App {
     #[cfg(test)]
-    pub(crate) fn new(
+    pub fn new(
         lines: Vec<Line<'static>>,
         toc: Vec<TocEntry>,
         filename: String,
@@ -162,7 +162,7 @@ impl App {
         )
     }
 
-    pub(crate) fn new_with_source(
+    pub fn new_with_source(
         lines: Vec<Line<'static>>,
         toc: Vec<TocEntry>,
         config: AppConfig,
@@ -267,92 +267,92 @@ impl App {
         app
     }
 
-    pub(crate) fn set_extras(&mut self, extras: Vec<String>) {
+    pub fn set_extras(&mut self, extras: Vec<String>) {
         self.file_picker.extras = extras;
     }
 
-    pub(crate) fn set_file_mode(&mut self, file_mode: bool) {
+    pub fn set_file_mode(&mut self, file_mode: bool) {
         self.file_mode = file_mode;
     }
 
-    pub(crate) fn set_max_width(&mut self, max_width: Option<usize>) {
+    pub fn set_max_width(&mut self, max_width: Option<usize>) {
         self.max_width = max_width;
     }
 
-    pub(crate) fn max_width(&self) -> Option<usize> {
+    pub fn max_width(&self) -> Option<usize> {
         self.max_width
     }
 
-    pub(crate) fn set_watch_from_config(&mut self, value: bool) {
+    pub fn set_watch_from_config(&mut self, value: bool) {
         self.watch_from_config = value;
     }
 
-    pub(crate) fn is_watch_enabled(&self) -> bool {
+    pub fn is_watch_enabled(&self) -> bool {
         self.watch
     }
 
-    pub(crate) fn is_watch_error(&self) -> bool {
+    pub fn is_watch_error(&self) -> bool {
         self.watch_error
     }
 
-    pub(crate) fn set_watch_error(&mut self, error: bool) {
+    pub fn set_watch_error(&mut self, error: bool) {
         self.watch_error = error;
     }
 
-    pub(crate) fn debug_input_enabled(&self) -> bool {
+    pub fn debug_input_enabled(&self) -> bool {
         self.debug_input
     }
 
-    pub(crate) fn is_toc_visible(&self) -> bool {
+    pub fn is_toc_visible(&self) -> bool {
         self.toc_visible
     }
 
-    pub(crate) fn has_toc(&self) -> bool {
+    pub fn has_toc(&self) -> bool {
         !self.toc.is_empty()
     }
 
     // Always >= 5 (scroll padding).
     // Use has_content() to check for actual content.
-    pub(crate) fn total(&self) -> usize {
+    pub fn total(&self) -> usize {
         self.lines.len()
     }
 
-    pub(crate) fn scroll(&self) -> usize {
+    pub fn scroll(&self) -> usize {
         self.scroll
     }
 
-    pub(crate) fn visible_lines(&self, start: usize, end: usize) -> &[Line<'static>] {
+    pub fn visible_lines(&self, start: usize, end: usize) -> &[Line<'static>] {
         &self.lines[start..end]
     }
 
-    pub(crate) fn highlighted_line_cache(&self) -> Option<(usize, &Line<'static>)> {
+    pub fn highlighted_line_cache(&self) -> Option<(usize, &Line<'static>)> {
         self.highlighted_line_cache
             .as_ref()
             .map(|(idx, _, line)| (*idx, line))
     }
 
-    pub(crate) fn toc_display_lines(&self) -> &[Line<'static>] {
+    pub fn toc_display_lines(&self) -> &[Line<'static>] {
         &self.toc_display_lines
     }
 
-    pub(crate) fn toc_header_line(&self) -> &Line<'static> {
+    pub fn toc_header_line(&self) -> &Line<'static> {
         &self.toc_header_line
     }
 
-    pub(crate) fn status_line(&self) -> &Line<'static> {
+    pub fn status_line(&self) -> &Line<'static> {
         &self.status_line
     }
 
-    pub(crate) fn filename(&self) -> &str {
+    pub fn filename(&self) -> &str {
         &self.filename
     }
 
     #[cfg(test)]
-    pub(crate) fn line(&self, idx: usize) -> Option<&Line<'static>> {
+    pub fn line(&self, idx: usize) -> Option<&Line<'static>> {
         self.lines.get(idx)
     }
 
-    pub(crate) fn active_toc_index(&self) -> Option<usize> {
+    pub fn active_toc_index(&self) -> Option<usize> {
         let hide_single_h1 = should_hide_single_h1(&self.toc);
         let is_visible = |entry: &&TocEntry| !(hide_single_h1 && entry.level == 1);
 
@@ -392,7 +392,7 @@ impl App {
         }
     }
 
-    pub(crate) fn refresh_highlighted_line_cache(&mut self, line_idx: usize) -> Option<()> {
+    pub fn refresh_highlighted_line_cache(&mut self, line_idx: usize) -> Option<()> {
         let qh = self.search.query_hash;
         let needs_refresh = self
             .highlighted_line_cache
@@ -411,7 +411,7 @@ impl App {
         Some(())
     }
 
-    pub(crate) fn refresh_toc_cache(&mut self) {
+    pub fn refresh_toc_cache(&mut self) {
         let hide_single_h1 = should_hide_single_h1(&self.toc);
         let promote_h2_root = should_promote_h2_when_no_h1(&self.toc);
         let active_idx = self.active_toc_index();
@@ -442,7 +442,7 @@ impl App {
             .collect();
     }
 
-    pub(crate) fn refresh_status_cache(&mut self, pct: u16) {
+    pub fn refresh_status_cache(&mut self, pct: u16) {
         let cache_key = StatusCacheKey {
             pct,
             search_mode: self.search.mode,
@@ -495,34 +495,34 @@ impl App {
         self.status_cache_key = Some(cache_key);
     }
 
-    pub(crate) fn refresh_static_caches(&mut self) {
+    pub fn refresh_static_caches(&mut self) {
         self.toc_active_idx = None;
         self.toc_display_lines.clear();
         self.refresh_toc_cache();
         self.status_cache_key = None;
     }
 
-    pub(crate) fn set_editor_config(&mut self, editor: Option<String>) {
+    pub fn set_editor_config(&mut self, editor: Option<String>) {
         self.editor_config = editor;
     }
 
-    pub(crate) fn editor_config(&self) -> Option<&str> {
+    pub fn editor_config(&self) -> Option<&str> {
         self.editor_config.as_deref()
     }
 
-    pub(crate) fn filepath(&self) -> Option<&std::path::Path> {
+    pub fn filepath(&self) -> Option<&std::path::Path> {
         self.filepath.as_deref()
     }
 
-    pub(crate) fn has_content(&self) -> bool {
+    pub fn has_content(&self) -> bool {
         self.filepath.is_some() || !self.source.is_empty()
     }
 
-    pub(crate) fn set_dir_arg(&mut self, dir: PathBuf) {
+    pub fn set_dir_arg(&mut self, dir: PathBuf) {
         self.dir_arg = Some(dir);
     }
 
-    pub(crate) fn picker_dir(&self) -> PathBuf {
+    pub fn picker_dir(&self) -> PathBuf {
         if let Some(ref dir) = self.dir_arg {
             return dir.clone();
         }

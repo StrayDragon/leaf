@@ -14,7 +14,7 @@ pub(super) fn syntect_to_color(c: syntect::highlighting::Color) -> Color {
     Color::Rgb(c.r, c.g, c.b)
 }
 
-pub(crate) fn resolve_syntax<'a>(
+pub fn resolve_syntax<'a>(
     lang: &str,
     ss: &'a SyntaxSet,
 ) -> &'a syntect::parsing::SyntaxReference {

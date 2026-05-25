@@ -9,25 +9,25 @@ const DEFAULT_WIDTH: usize = 80;
 const MIN_WIDTH: usize = 20;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct InlineSpec {
-    pub(crate) format: InlineFormat,
-    pub(crate) width: Option<usize>,
+pub struct InlineSpec {
+    pub format: InlineFormat,
+    pub width: Option<usize>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum InlineFormat {
+pub enum InlineFormat {
     Auto,
     Ansi,
     Plain,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum ResolvedFormat {
+pub enum ResolvedFormat {
     Ansi,
     Plain,
 }
 
-pub(crate) fn is_inline_spec(value: &str) -> bool {
+pub fn is_inline_spec(value: &str) -> bool {
     if value.starts_with('-') {
         return false;
     }
@@ -41,7 +41,7 @@ pub(crate) fn is_inline_spec(value: &str) -> bool {
     matches!(lower.split_once(':'), Some((fmt, _)) if fmt == "ansi" || fmt == "plain")
 }
 
-pub(crate) fn parse_inline_spec(value: &str) -> Result<InlineSpec> {
+pub fn parse_inline_spec(value: &str) -> Result<InlineSpec> {
     let value = value.trim();
     if value.is_empty() {
         bail!("Empty inline spec");
@@ -89,7 +89,7 @@ fn parse_width(s: &str) -> Result<usize> {
     Ok(w.max(MIN_WIDTH))
 }
 
-pub(crate) fn render_width(spec: &InlineSpec, is_stdout_terminal: bool) -> usize {
+pub fn render_width(spec: &InlineSpec, is_stdout_terminal: bool) -> usize {
     if let Some(w) = spec.width {
         return w.max(MIN_WIDTH);
     }
@@ -102,7 +102,7 @@ pub(crate) fn render_width(spec: &InlineSpec, is_stdout_terminal: bool) -> usize
     }
 }
 
-pub(crate) fn resolve_format(spec: &InlineSpec, is_stdout_terminal: bool) -> ResolvedFormat {
+pub fn resolve_format(spec: &InlineSpec, is_stdout_terminal: bool) -> ResolvedFormat {
     match spec.format {
         InlineFormat::Ansi => ResolvedFormat::Ansi,
         InlineFormat::Plain => ResolvedFormat::Plain,
@@ -111,7 +111,7 @@ pub(crate) fn resolve_format(spec: &InlineSpec, is_stdout_terminal: bool) -> Res
     }
 }
 
-pub(crate) fn write_lines<W: Write>(
+pub fn write_lines<W: Write>(
     lines: &[Line<'_>],
     format: ResolvedFormat,
     max_width: usize,

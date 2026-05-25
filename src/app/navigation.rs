@@ -14,12 +14,12 @@ pub(super) struct NumkeyCycleState {
 }
 
 impl App {
-    pub(crate) fn max_scroll(&self) -> usize {
+    pub fn max_scroll(&self) -> usize {
         self.total()
             .saturating_sub(self.content_area.height as usize)
     }
 
-    pub(crate) fn scroll_percent(&self) -> u16 {
+    pub fn scroll_percent(&self) -> u16 {
         let max = self.max_scroll();
         if max == 0 {
             return 100;
@@ -32,36 +32,36 @@ impl App {
         self.reverse_mode = false;
     }
 
-    pub(crate) fn toggle_reverse_mode(&mut self) {
+    pub fn toggle_reverse_mode(&mut self) {
         self.reverse_mode = !self.reverse_mode;
     }
 
-    pub(crate) fn scroll_down(&mut self, n: usize) {
+    pub fn scroll_down(&mut self, n: usize) {
         self.reset_numkey_state();
         self.scroll = (self.scroll + n).min(self.max_scroll());
     }
 
-    pub(crate) fn scroll_up(&mut self, n: usize) {
+    pub fn scroll_up(&mut self, n: usize) {
         self.reset_numkey_state();
         self.scroll = self.scroll.saturating_sub(n);
     }
 
-    pub(crate) fn scroll_top(&mut self) {
+    pub fn scroll_top(&mut self) {
         self.reset_numkey_state();
         self.scroll = 0;
     }
 
-    pub(crate) fn scroll_bottom(&mut self) {
+    pub fn scroll_bottom(&mut self) {
         self.reset_numkey_state();
         self.scroll = self.max_scroll();
     }
 
-    pub(crate) fn scroll_to(&mut self, position: usize) {
+    pub fn scroll_to(&mut self, position: usize) {
         self.reset_numkey_state();
         self.scroll = position.min(self.max_scroll());
     }
 
-    pub(crate) fn toggle_toc(&mut self) {
+    pub fn toggle_toc(&mut self) {
         self.toc_visible = !self.toc_visible;
     }
 
@@ -93,7 +93,7 @@ impl App {
         group
     }
 
-    pub(crate) fn cycle_numkey(&mut self, key: u8) {
+    pub fn cycle_numkey(&mut self, key: u8) {
         let group = self.toc_group_for_numkey(key);
         if group.is_empty() {
             return;

@@ -1,7 +1,7 @@
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-pub(crate) fn open_url(url: &str) -> bool {
+pub fn open_url(url: &str) -> bool {
     let cmd: &[&str] = match std::env::consts::OS {
         "macos" => &["open", url],
         "windows" => &["cmd", "/c", "start", "", url],
@@ -16,7 +16,7 @@ pub(crate) fn open_url(url: &str) -> bool {
         .is_ok()
 }
 
-pub(crate) fn copy_to_clipboard(text: &str) -> bool {
+pub fn copy_to_clipboard(text: &str) -> bool {
     let b64 = base64_encode(text.as_bytes());
     print!("\x1b]52;c;{b64}\x07");
     let _ = std::io::stdout().flush();

@@ -7,17 +7,17 @@ use ratatui::{
     text::Span,
 };
 
-pub(crate) fn status_bar_bg() -> Color {
+pub fn status_bar_bg() -> Color {
     app_theme().ui.status_bg
 }
 
-pub(crate) fn status_separator_style(bar_bg: Color) -> Style {
+pub fn status_separator_style(bar_bg: Color) -> Style {
     Style::default()
         .fg(app_theme().ui.status_separator)
         .bg(bar_bg)
 }
 
-pub(crate) fn join_span_sections(
+pub fn join_span_sections(
     sections: Vec<Vec<Span<'static>>>,
     separator: Span<'static>,
 ) -> Vec<Span<'static>> {
@@ -31,7 +31,7 @@ pub(crate) fn join_span_sections(
     joined
 }
 
-pub(crate) fn status_brand_section() -> Vec<Span<'static>> {
+pub fn status_brand_section() -> Vec<Span<'static>> {
     let theme = app_theme();
     vec![Span::styled(
         " leaf ",
@@ -42,7 +42,7 @@ pub(crate) fn status_brand_section() -> Vec<Span<'static>> {
     )]
 }
 
-pub(crate) fn status_filename_section(filename: &str) -> Vec<Span<'static>> {
+pub fn status_filename_section(filename: &str) -> Vec<Span<'static>> {
     let theme = app_theme();
     vec![Span::styled(
         format!(" {} ", filename),
@@ -70,7 +70,7 @@ fn watch_flash_section(app: &App) -> Option<Vec<Span<'static>>> {
     Some(vec![Span::styled(text, Style::default().fg(fg).bg(bar_bg))])
 }
 
-pub(crate) fn status_watch_section(app: &App) -> Option<Vec<Span<'static>>> {
+pub fn status_watch_section(app: &App) -> Option<Vec<Span<'static>>> {
     let theme = app_theme();
     if !app.is_watch_enabled() {
         return None;
@@ -107,7 +107,7 @@ pub(crate) fn status_watch_section(app: &App) -> Option<Vec<Span<'static>>> {
     Some(vec![span])
 }
 
-pub(crate) fn status_search_section(app: &App) -> Option<Vec<Span<'static>>> {
+pub fn status_search_section(app: &App) -> Option<Vec<Span<'static>>> {
     let theme = app_theme();
     if app.is_search_mode() {
         return Some(vec![Span::styled(
@@ -140,7 +140,7 @@ pub(crate) fn status_search_section(app: &App) -> Option<Vec<Span<'static>>> {
     Some(vec![span])
 }
 
-pub(crate) fn status_hint_segments(app: &App) -> &'static [&'static str] {
+pub fn status_hint_segments(app: &App) -> &'static [&'static str] {
     if app.is_search_mode() {
         &["enter confirm", "esc cancel"]
     } else if app.has_active_search() {
@@ -150,7 +150,7 @@ pub(crate) fn status_hint_segments(app: &App) -> &'static [&'static str] {
     }
 }
 
-pub(crate) fn status_shortcuts_section(app: &App, bar_bg: Color) -> Vec<Span<'static>> {
+pub fn status_shortcuts_section(app: &App, bar_bg: Color) -> Vec<Span<'static>> {
     let theme = app_theme();
     let separator = Span::styled(" · ", status_separator_style(bar_bg));
     let sections = status_hint_segments(app)
@@ -165,7 +165,7 @@ pub(crate) fn status_shortcuts_section(app: &App, bar_bg: Color) -> Vec<Span<'st
     join_span_sections(sections, separator)
 }
 
-pub(crate) fn status_percent_section(pct: u16, bar_bg: Color) -> Vec<Span<'static>> {
+pub fn status_percent_section(pct: u16, bar_bg: Color) -> Vec<Span<'static>> {
     let theme = app_theme();
     vec![Span::styled(
         format!("{:>3}% ", pct),
@@ -250,7 +250,7 @@ fn path_flash_section(app: &App) -> Option<Vec<Span<'static>>> {
     Some(vec![Span::styled(text, Style::default().fg(fg).bg(bar_bg))])
 }
 
-pub(crate) fn build_status_bar(app: &App, pct: u16) -> Vec<Span<'static>> {
+pub fn build_status_bar(app: &App, pct: u16) -> Vec<Span<'static>> {
     let bar_bg = status_bar_bg();
     let outer_separator = Span::raw(" ");
 

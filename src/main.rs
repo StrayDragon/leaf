@@ -1,85 +1,19 @@
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result};
 use ratatui::{backend::CrosstermBackend, Terminal};
-use std::{fs::OpenOptions, io, io::IsTerminal, io::Read, io::Write, path::PathBuf};
+use std::{fs::OpenOptions, io, io::IsTerminal, io::Write, path::PathBuf};
 use syntect::{highlighting::ThemeSet, parsing::SyntaxSet};
 
-mod app;
-mod cli;
-mod clipboard;
-mod completions;
-mod config;
-mod editor;
-mod inline;
-mod markdown;
-mod render;
-mod runtime;
-mod terminal;
-#[cfg(test)]
-mod tests;
-mod theme;
-mod update;
-
-use app::{App, AppConfig};
-use cli::{parse_cli, print_usage, print_version, CliOptions};
-use markdown::{hash_str, parse_markdown, parse_markdown_with_width, read_file_state};
-use runtime::run;
-use terminal::{finish_with_restore, TerminalSession};
-use theme::{
+use leaf::app::{App, AppConfig};
+use leaf::cli::{parse_cli, print_usage, print_version, CliOptions};
+use leaf::markdown::{hash_str, parse_markdown, parse_markdown_with_width, read_file_state};
+use leaf::runtime::run;
+use leaf::terminal::{finish_with_restore, TerminalSession};
+use leaf::theme::{
     app_theme, current_syntect_theme, resolve_theme_selection, set_theme_selection,
     validate_theme_syntax,
 };
-use update::run_update;
-
-const MAX_STDIN_BYTES: usize = 8 * 1024 * 1024;
-
-#[cfg(test)]
-pub(crate) use config::{config_path, LeafConfig};
-#[cfg(test)]
-pub(crate) use editor::{
-    binary_name, classify, resolve_editor, split_editor_cmd, try_new_tab_command, EditorKind,
-    TerminalEmulator,
-};
-#[cfg(test)]
-pub(crate) use markdown::toc::{
-    normalize_toc, should_hide_single_h1, should_promote_h2_when_no_h1, toc_display_level, TocEntry,
-};
-#[cfg(test)]
-pub(crate) use markdown::{display_width, line_plain_text};
-#[cfg(test)]
-pub(crate) use read_stdin_limited as read_stdin_with_limit;
-#[cfg(test)]
-pub(crate) use render::wrap_path_lines;
-#[cfg(test)]
-pub(crate) use runtime::should_handle_key;
-#[cfg(test)]
-pub(crate) use theme::{
-    parse_theme_color, parse_theme_preset, theme_preset_label, CustomThemeConfig, ThemePreset,
-    ThemeSelection, THEME_PRESETS,
-};
-#[cfg(test)]
-pub(crate) use update::{
-    asset_name_for_target, expected_asset_download_url, find_expected_checksum, is_newer_version,
-    validate_download_size, validate_sha256_hex,
-};
-
-fn read_stdin_limited<R: Read>(reader: &mut R, max_bytes: usize) -> Result<String> {
-    let mut buf = Vec::with_capacity(max_bytes.min(8192));
-    let limit = u64::try_from(max_bytes)
-        .ok()
-        .and_then(|value| value.checked_add(1))
-        .context("stdin size limit is too large")?;
-    reader
-        .take(limit)
-        .read_to_end(&mut buf)
-        .context("Cannot read stdin")?;
-    if buf.len() > max_bytes {
-        bail!(
-            "stdin exceeds the maximum supported size of {} bytes",
-            max_bytes
-        );
-    }
-    String::from_utf8(buf).context("stdin is not valid UTF-8")
-}
+use leaf::update::run_update;
+use leaf::{read_stdin_limited, MAX_STDIN_BYTES};
 
 fn resolve_configured_width(
     cli_width: Option<usize>,
@@ -128,11 +62,11 @@ fn main() -> Result<()> {
         return Ok(());
     }
     if options.config {
-        config::run_config()?;
+        leaf::config::run_config()?;
         return Ok(());
     }
     if let Some(ref ac_arg) = options.auto_complete {
-        completions::run_auto_complete(ac_arg)?;
+        leaf::completions::run_auto_complete(ac_arg)?;
         return Ok(());
     }
     let CliOptions {
@@ -147,11 +81,11 @@ fn main() -> Result<()> {
         ..
     } = options;
 
-    let overrides = config::CliOverrides {
+    let overrides = leaf::config::CliOverrides {
         width: cli_width,
         theme: cli_theme.clone(),
     };
-    let (user_config, mut config_warning) = config::load_config(&overrides);
+    let (user_config, mut config_warning) = leaf::config::load_config(&overrides);
 
     let theme_selection = if let Some(theme_name) = cli_theme.as_deref() {
         resolve_theme_selection(theme_name, &user_config.themes, None)
@@ -170,7 +104,7 @@ fn main() -> Result<()> {
         )
         .unwrap_or_default()
     } else {
-        theme::ThemeSelection::default()
+        leaf::theme::ThemeSelection::default()
     };
 
     let watch_from_config = user_config.watch.unwrap_or(false);
@@ -183,8 +117,8 @@ fn main() -> Result<()> {
     }
 
     let resolved_editor =
-        editor::resolve_editor(cli_editor.as_deref(), user_config.editor.as_deref());
-    runtime::debug_log(debug_input, &format!("main start args={args:?}"));
+        leaf::editor::resolve_editor(cli_editor.as_deref(), user_config.editor.as_deref());
+    leaf::runtime::debug_log(debug_input, &format!("main start args={args:?}"));
 
     if debug_input {
         let mut file = OpenOptions::new()
@@ -259,7 +193,7 @@ fn main() -> Result<()> {
     );
     set_theme_selection(theme_selection);
     let theme = current_syntect_theme(&ts).clone();
-    runtime::debug_log(
+    leaf::runtime::debug_log(
         debug_input,
         &format!(
             "main input_ready filename={filename} filepath={} picker={} watch={}",
@@ -284,12 +218,12 @@ fn main() -> Result<()> {
 
     if let Some(ref spec) = inline_spec {
         if src.is_empty() && filepath.is_none() {
-            bail!("--inline requires a file path or stdin input");
+            anyhow::bail!("--inline requires a file path or stdin input");
         }
 
         let is_tty = io::stdout().is_terminal();
-        let width = inline::render_width(spec, is_tty);
-        let format = inline::resolve_format(spec, is_tty);
+        let width = leaf::inline::render_width(spec, is_tty);
+        let format = leaf::inline::resolve_format(spec, is_tty);
 
         let at = app_theme();
         let (mut lines, _, _) =
@@ -303,7 +237,7 @@ fn main() -> Result<()> {
 
         let stdout = io::stdout();
         let mut writer = io::BufWriter::new(stdout.lock());
-        inline::write_lines(&lines, format, width, &mut writer)?;
+        leaf::inline::write_lines(&lines, format, width, &mut writer)?;
         return Ok(());
     }
 
@@ -338,7 +272,7 @@ fn main() -> Result<()> {
     if let Some(dir) = open_fuzzy_picker_dir {
         app.queue_fuzzy_file_picker(dir);
     }
-    runtime::debug_log(
+    leaf::runtime::debug_log(
         debug_input,
         &format!(
             "main app_ready pending_picker={} picker_loading={}",
@@ -350,38 +284,38 @@ fn main() -> Result<()> {
     let mut stdout = io::stdout();
     print!("\x1b]0;leaf\x07");
     let _ = io::stdout().flush();
-    runtime::debug_log(debug_input, "terminal enter start");
+    leaf::runtime::debug_log(debug_input, "terminal enter start");
     let mut session = TerminalSession::enter(&mut stdout)?;
-    runtime::debug_log(debug_input, "terminal enter done");
+    leaf::runtime::debug_log(debug_input, "terminal enter done");
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout))?;
-    runtime::debug_log(debug_input, "terminal new done");
+    leaf::runtime::debug_log(debug_input, "terminal new done");
     terminal.clear()?;
-    runtime::debug_log(debug_input, "terminal clear done");
+    leaf::runtime::debug_log(debug_input, "terminal clear done");
     let initial_draw_result = (|| -> Result<()> {
         let area = terminal.size()?;
-        runtime::debug_log(
+        leaf::runtime::debug_log(
             debug_input,
             &format!(
                 "initial_draw size width={} height={}",
                 area.width, area.height
             ),
         );
-        runtime::prepare_initial_picker_state(area.width as usize, &mut app, &ss, &ts)?;
-        runtime::debug_log(debug_input, "initial_draw draw start");
-        terminal.draw(|f| render::ui(f, &mut app))?;
-        runtime::debug_log(debug_input, "initial_draw draw done");
+        leaf::runtime::prepare_initial_picker_state(area.width as usize, &mut app, &ss, &ts)?;
+        leaf::runtime::debug_log(debug_input, "initial_draw draw start");
+        terminal.draw(|f| leaf::render::ui(f, &mut app))?;
+        leaf::runtime::debug_log(debug_input, "initial_draw draw done");
         session.finish_initial_draw(&mut terminal)?;
-        runtime::debug_log(debug_input, "initial_draw sync end done");
+        leaf::runtime::debug_log(debug_input, "initial_draw sync end done");
         Ok(())
     })();
     let run_result = match initial_draw_result {
         Ok(()) => {
-            runtime::debug_log(debug_input, "run loop start");
+            leaf::runtime::debug_log(debug_input, "run loop start");
             run(&mut terminal, &mut app, &ss, &ts, true)
         }
         Err(err) => Err(err),
     };
-    runtime::debug_log(debug_input, "run loop end");
+    leaf::runtime::debug_log(debug_input, "run loop end");
     let restore_result = session.restore(&mut terminal);
     finish_with_restore(run_result, restore_result)
 }

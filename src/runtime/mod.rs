@@ -26,11 +26,11 @@ const PATH_FLASH_DURATION: Duration = Duration::from_millis(FLASH_DURATION_MS);
 const DOUBLE_CLICK_THRESHOLD: Duration = Duration::from_millis(400);
 const MOUSE_SCROLL_STEP: usize = 3;
 
-pub(crate) fn should_handle_key(kind: KeyEventKind) -> bool {
+pub fn should_handle_key(kind: KeyEventKind) -> bool {
     !matches!(kind, KeyEventKind::Release)
 }
 
-pub(crate) fn debug_log(enabled: bool, message: &str) {
+pub fn debug_log(enabled: bool, message: &str) {
     if !enabled {
         return;
     }
@@ -47,7 +47,7 @@ pub(crate) fn debug_log(enabled: bool, message: &str) {
     }
 }
 
-pub(crate) fn prepare_initial_picker_state(
+pub fn prepare_initial_picker_state(
     area_width: usize,
     app: &mut App,
     ss: &SyntaxSet,
@@ -72,7 +72,7 @@ pub(crate) fn prepare_initial_picker_state(
     Ok(())
 }
 
-pub(crate) fn run(
+pub fn run(
     terminal: &mut Terminal<CrosstermBackend<io::Stdout>>,
     app: &mut App,
     ss: &SyntaxSet,
