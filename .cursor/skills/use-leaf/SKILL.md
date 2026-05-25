@@ -164,9 +164,38 @@ Custom TOML overrides only changed colors
 Global thread-safe theme state
 ```
 
+## Streaming Rendering (LLM Token Output)
+
+`leaf-core` provides `StreamingRenderer` for progressive LLM output:
+
+```rust
+use leaf_core::streaming::StreamingRenderer;
+use leaf_core::MarkdownRenderer;
+
+let mut stream = StreamingRenderer::new(MarkdownRenderer::new(), 80)
+    .with_dual_phase(true)    // optional: method C
+    .with_debounce(Duration::from_millis(100));
+
+// In your token handler:
+stream.push(token);
+
+// In your event loop (every frame):
+if let Some(update) = stream.tick() {
+    // update.lines — all rendered lines
+    // update.changed_from — first changed line (for partial redraw)
+    // update.phase — FullReparse | DualPhase | Final
+    redraw(&update.lines[update.changed_from..]);
+}
+
+// When stream ends:
+let final_output = stream.finish();
+```
+
+Three tiers: debounced full reparse (A), incremental diff (B), dual-phase committed+approximate (C).
+
 ## Fork for Library Use
 
-leaf is a binary-only crate — no `lib.rs`, no public API. To use its rendering engine as a Rust library:
+leaf was originally a binary-only crate. The fork adds `lib.rs` + `leaf-core` facade:
 
 **Quick fork path (~3-5 dev-days):**
 
