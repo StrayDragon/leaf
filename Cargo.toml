@@ -1,3 +1,6 @@
+[workspace]
+members = ["crates/leaf-core"]
+
 [package]
 name = "leaf"
 version = "1.23.0"
