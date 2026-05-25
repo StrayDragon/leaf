@@ -10,3 +10,7 @@ leaf = { path = "../.." }
 ratatui = "0.30"
 syntect = { version = "5.2", default-features = false, features = ["default-syntaxes", "default-themes", "regex-onig"] }
 anyhow = "1.0"
+
+[[bench]]
+name = "streaming_bench"
+harness = false
