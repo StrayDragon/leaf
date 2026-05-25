@@ -9,21 +9,33 @@ const DEFAULT_WIDTH: usize = 80;
 const MIN_WIDTH: usize = 20;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+/// Specification for inline (non-TUI) rendering: format and optional width.
 pub struct InlineSpec {
+    /// Output format: auto-detect, force ANSI, or force plain text.
     pub format: InlineFormat,
+    /// Max output width in columns. `None` uses terminal width or 80.
     pub width: Option<usize>,
 }
 
+/// Requested output format for inline rendering.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum InlineFormat {
+    /// Auto-detect: ANSI if stdout is a TTY, plain otherwise.
     Auto,
+    /// Force ANSI escape codes (colors, bold, etc.).
     Ansi,
+    /// Force plain text (no escape codes).
     Plain,
 }
 
+/// Resolved output format after auto-detection.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum ResolvedFormat {
+    /// ANSI escape codes.
     Ansi,
+    /// Plain text.
     Plain,
 }
 

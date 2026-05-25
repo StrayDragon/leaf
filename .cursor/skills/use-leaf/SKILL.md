@@ -175,20 +175,29 @@ leaf is a binary-only crate — no `lib.rs`, no public API. To use its rendering
 3. Fix 2 couplings: `TableBuf::render` global theme → explicit param; `FileState` move out of `app`
 4. Replace tuple returns with `ParseOutput` struct
 
-**Key API surface to expose:**
+**Public API (available now on `feat/expose-lib-api` branch):**
 
 ```rust
-// Core: Markdown → styled terminal lines
-leaf::markdown::parse_markdown_with_width(src, ss, theme, width, md_theme, file_mode) -> ParseOutput
+use leaf::markdown;
+use leaf::theme::{theme_by_preset, ThemePreset};
+use syntect::{highlighting::ThemeSet, parsing::SyntaxSet};
 
-// Output: ANSI or plain text to any writer
-leaf::inline::write_lines(lines, format, max_width, writer) -> Result<()>
+let ss = SyntaxSet::load_defaults_newlines();
+let ts = ThemeSet::load_defaults();
+let app_theme = theme_by_preset(ThemePreset::OceanDark);
+let syntect_theme = &ts.themes["base16-ocean.dark"];
 
-// Themes: built-in presets or custom TOML
-leaf::theme::theme_by_preset(ThemePreset::OceanDark) -> &'static AppTheme
+// Parse → ParseOutput { lines, toc, links }
+let output = markdown::parse("# Hello\nworld", &ss, syntect_theme, &app_theme.markdown, false);
+
+// Render to ANSI string
+let mut buf = Vec::new();
+leaf::inline::write_lines(&output.lines, leaf::inline::ResolvedFormat::Ansi, 80, &mut buf).unwrap();
 ```
 
-**Hard dependencies exposed:** `ratatui::text::Line`, `syntect::parsing::SyntaxSet`, `syntect::highlighting::Theme`
+Key types: `ParseOutput` (`#[non_exhaustive]`), `TocEntry`, `LinkSpan`, `ThemePreset`, `AppTheme`, `MarkdownTheme`.
+
+**Hard dependencies:** `ratatui::text::Line`, `syntect::parsing::SyntaxSet`, `syntect::highlighting::Theme`.
 
 See [fork-guide.md](fork-guide.md) for detailed refactoring steps, type inventory, and effort estimates.
 

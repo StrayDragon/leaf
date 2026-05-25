@@ -179,19 +179,20 @@ semver = { version = "1.0", optional = true }
 
 ```rust
 use leaf::{
-    markdown::parse_markdown_with_width,
+    markdown,
     inline::{write_lines, ResolvedFormat},
-    theme::theme_by_preset,
+    theme::{theme_by_preset, ThemePreset},
 };
 use syntect::{highlighting::ThemeSet, parsing::SyntaxSet};
 
-fn render_to_string(markdown_source: &str, width: usize) -> String {
+fn render_to_ansi(markdown_source: &str, width: usize) -> String {
     let ss = SyntaxSet::load_defaults_newlines();
     let ts = ThemeSet::load_defaults();
-    let app_theme = theme_by_preset(leaf::theme::ThemePreset::OceanDark);
+    let app_theme = theme_by_preset(ThemePreset::OceanDark);
     let syntect_theme = &ts.themes["base16-ocean.dark"];
 
-    let output = parse_markdown_with_width(
+    // parse() returns ParseOutput { lines, toc, links }
+    let output = markdown::parse_with_width(
         markdown_source, &ss, syntect_theme, width, &app_theme.markdown, false,
     );
 
@@ -199,6 +200,11 @@ fn render_to_string(markdown_source: &str, width: usize) -> String {
     write_lines(&output.lines, ResolvedFormat::Ansi, width, &mut buf).unwrap();
     String::from_utf8(buf).unwrap()
 }
+
+// Add to Cargo.toml:
+// leaf = { path = "../leaf", default-features = false }
+// — or with git:
+// leaf = { git = "https://github.com/StrayDragon/leaf", branch = "feat/expose-lib-api" }
 ```
 
 ## 命名建议

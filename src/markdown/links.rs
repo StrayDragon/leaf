@@ -4,10 +4,16 @@ use ratatui::text::Line;
 use super::width::display_width;
 use super::LINK_MARKER;
 
+/// A detected link within the rendered output, with its position and target URL.
+#[non_exhaustive]
 pub struct LinkSpan {
+    /// Zero-based line index.
     pub line_idx: usize,
+    /// Start column (display width).
     pub start_col: usize,
+    /// End column (exclusive, display width).
     pub end_col: usize,
+    /// Link target URL.
     pub url: String,
 }
 

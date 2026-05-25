@@ -1,7 +1,12 @@
+/// A single table-of-contents entry extracted from a heading.
 #[derive(Clone)]
+#[non_exhaustive]
 pub struct TocEntry {
+    /// Heading level (1 for h1, 2 for h2, etc.).
     pub level: u8,
+    /// Plain text of the heading.
     pub title: String,
+    /// Zero-based line index in the rendered output.
     pub line: usize,
 }
 

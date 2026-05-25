@@ -1,15 +1,48 @@
+//! # leaf — Terminal Markdown rendering library
+//!
+//! `leaf` provides a Markdown-to-terminal rendering pipeline built on
+//! `pulldown-cmark` for parsing and [`ratatui`] for styled output.
+//!
+//! ## Quick start
+//!
+//! ```rust,no_run
+//! use leaf::markdown;
+//! use leaf::theme::{theme_by_preset, ThemePreset};
+//! use syntect::{highlighting::ThemeSet, parsing::SyntaxSet};
+//!
+//! let ss = SyntaxSet::load_defaults_newlines();
+//! let ts = ThemeSet::load_defaults();
+//! let app_theme = theme_by_preset(ThemePreset::OceanDark);
+//! let syntect_theme = &ts.themes["base16-ocean.dark"];
+//!
+//! let output = markdown::parse(
+//!     "# Hello\nworld", &ss, syntect_theme, &app_theme.markdown, false,
+//! );
+//! assert!(!output.lines.is_empty());
+//! ```
+
 use anyhow::{bail, Context, Result};
 use std::io::Read;
 
 // ── Public API (Tier 1) ──────────────────────────
-pub mod inline;
+
+/// Markdown parsing pipeline: source text → styled [`ratatui::text::Line`]s.
 pub mod markdown;
+
+/// Non-interactive stdout rendering (ANSI / plain text).
+pub mod inline;
+
+/// Color themes: built-in presets and custom TOML theme loading.
 pub mod theme;
 
 pub use markdown::ParseOutput;
 
 // ── Semi-public API (Tier 2) ─────────────────────
+
+/// Configuration file loading and defaults.
 pub mod config;
+
+/// External editor detection and launch.
 pub mod editor;
 
 // ── Internal modules (used by binary, hidden from docs) ──
@@ -33,8 +66,11 @@ pub mod update;
 #[cfg(test)]
 mod tests;
 
+/// Maximum bytes accepted from stdin (8 MiB).
 pub const MAX_STDIN_BYTES: usize = 8 * 1024 * 1024;
 
+/// Read up to `max_bytes` from a reader, returning an error if the limit is exceeded
+/// or the content is not valid UTF-8.
 pub fn read_stdin_limited<R: Read>(reader: &mut R, max_bytes: usize) -> Result<String> {
     let mut buf = Vec::with_capacity(max_bytes.min(8192));
     let limit = u64::try_from(max_bytes)

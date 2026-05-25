@@ -13,8 +13,10 @@ pub use self::serde::CustomThemeConfig;
 pub use resolution::parse_theme_color;
 pub use resolution::{resolve_theme_selection, validate_theme_syntax};
 
+/// Built-in color theme presets.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(u8)]
+#[non_exhaustive]
 pub enum ThemePreset {
     Arctic = 0,
     Forest = 1,
@@ -28,10 +30,15 @@ impl Default for ThemePreset {
     }
 }
 
+/// Complete application theme: syntax highlighting name, UI colors, and Markdown colors.
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[non_exhaustive]
 pub struct AppTheme {
+    /// Name of the syntect theme used for code block highlighting.
     pub syntax_theme_name: Cow<'static, str>,
+    /// Colors for TUI chrome (status bar, TOC sidebar, etc.).
     pub ui: UiTheme,
+    /// Colors for Markdown content rendering (headings, code, links, etc.).
     pub markdown: MarkdownTheme,
 }
 

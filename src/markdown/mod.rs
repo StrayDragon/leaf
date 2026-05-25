@@ -25,10 +25,16 @@ pub use width::line_plain_text;
 pub use width::{build_searchable_lines, display_width, truncate_display_width};
 pub use toc::TocEntry;
 
-/// Structured output from Markdown parsing, replacing the raw tuple return.
+/// Structured output from Markdown parsing.
+///
+/// Contains the rendered terminal lines, table of contents, and detected link spans.
+#[non_exhaustive]
 pub struct ParseOutput {
+    /// Styled terminal lines ready for display via [`ratatui`] or [`crate::inline::write_lines`].
     pub lines: Vec<Line<'static>>,
+    /// Extracted table of contents entries (headings).
     pub toc: Vec<TocEntry>,
+    /// Link spans with their positions and URLs.
     pub links: Vec<LinkSpan>,
 }
 
@@ -227,6 +233,9 @@ fn push_text_event(
     push_custom_marker_spans(text, CUSTOM_MARKERS, fallback, theme, spans);
 }
 
+/// Parse Markdown source into styled terminal lines at the default width (80 columns).
+///
+/// Set `file_mode` to `true` when the source is a non-Markdown file wrapped as a code block.
 pub fn parse(
     src: &str,
     ss: &syntect::parsing::SyntaxSet,
@@ -239,6 +248,9 @@ pub fn parse(
     ParseOutput { lines, toc, links }
 }
 
+/// Parse Markdown source into styled terminal lines at a specific width.
+///
+/// `render_width` controls line wrapping and table layout. Minimum effective width is ~20.
 pub fn parse_with_width(
     src: &str,
     ss: &syntect::parsing::SyntaxSet,
