@@ -18,6 +18,8 @@
 //! assert!(!output.lines.is_empty());
 //! ```
 
+pub mod streaming;
+
 use std::io::Write;
 
 pub use leaf::inline::ResolvedFormat;
